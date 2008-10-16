@@ -12,12 +12,6 @@ def compile_and_run(compiler, code):
     the output of the program run.
     
     """
-#    stdin, stdouterr = os.popen4(compiler)
-#    stdin.write(code)
-#    stdin.close()
-#    compiler_ouput = stdouterr.readlines()
-#    stdouterr.close()
-#    return ('BAD', ''.join(compiler_ouput))
     proc = Popen4(compiler)
     proc.tochild.write(code)
     proc.tochild.close()
@@ -72,22 +66,24 @@ def run_test(compiler, code, correct_result):
 
 test_file_name = sys.argv[1]
 test_file = open(test_file_name)
-compiler = test_file.readline().strip()
 print "Loading test file '%s'." % test_file_name
-print "Using compile command '%s'.\n" % compiler
+compiler = '#'
+while compiler.startswith('#'):
+    compiler = test_file.readline().strip()
+print "Using compile command '%s'." % compiler
 test_count = 0
 pass_count = 0
 code = ""
 for line in test_file:
-    if line == ">>>\n":
+    if line == "...\n":
         code = ""
-    elif line[:4] == ">>> ":
+    elif line.startswith("... "):
         test_count += 1
         correct_result = line[4:-1]
         if (run_test(compiler, code, correct_result)):
             pass_count += 1
-    elif line[:1] != "#":
+    else:
         code += line
 test_file.close()
-
+os.remove('temp.exe')
 print "%d / %d tests passed." % (pass_count, test_count)
