@@ -64,6 +64,9 @@ def run_test(compiler, code, correct_result):
             print_indented(correct_result)
             return False
 
+if len(sys.argv) < 2:
+    print "You must specify a test file."
+    exit(1)
 test_file_name = sys.argv[1]
 test_file = open(test_file_name)
 print "Loading test file '%s'." % test_file_name
