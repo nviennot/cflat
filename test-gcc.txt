@@ -1,0 +1,31 @@
+# The first line that doesn't start with a '#' should be the compiler command.
+# It should read source code from stdin and produce an executable named
+# 'temp.exe'.
+gcc -x c -o temp.exe -
+
+After the compiler command, anything not within a test case (surrounded by ...)
+is ignored.
+The closing ... should be followed by a space and then the desired result of the
+test:
+* OK if the code should compile,
+* BAD if the code shouldn't compile, or
+* Any other single line string which the code, when run, should produce.
+  Whitespace may be trimmed from the front or back.
+
+...
+int main() {
+	return 0;
+}
+... OK
+
+...
+int main() {
+	puts("5");
+	return 0;
+}
+... 5
+
+...
+main() {
+}}
+... BAD
