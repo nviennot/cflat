@@ -88,5 +88,8 @@ for line in test_file:
     else:
         code += line
 test_file.close()
-os.remove('temp.exe')
+try:
+    os.remove('temp.exe')
+except:
+    pass
 print "%d / %d tests passed." % (pass_count, test_count)
