@@ -1,0 +1,139 @@
+# The first line that doesn't start with a '#' should be the compiler command.
+# It should read source code from stdin and produce an executable named
+# 'temp.exe'.
+gcc -x c -o temp.exe -
+
+After the compiler command, anything not within a test case (surrounded by ...)
+is ignored.
+The closing ... should be followed by a space and then the desired result of the
+test:
+* OK if the code should compile,
+* BAD if the code shouldn't compile, or
+* Any other single line string which the code, when run, should produce.
+  Whitespace may be trimmed from the front or back.
+
+
+Whitespace tests
+
+...
+int main():
+    return 0
+... OK
+
+...
+int main():
+return 0
+... BAD
+
+...
+int main():
+    if 1:
+        return 0
+    else:
+        return 1
+... OK
+
+------------------------------------------------------
+
+Comments
+C and C++ style comments allowed.
+    // I am a single line comment.
+    /* I am a multi-line comment. */
+Multi-line comments end with the first */ found.
+
+Control Flow
+Control flow is achieved using functions, if statements, while statements, and exceptions.
+
+Control starts in the main function which must exist. It doesn't take any arguments and must return an int.
+    int main():
+        return 0
+
+Types
+int, float (implemented as a double), char, bool, func.
+
+Func is a multi-type. The types that the funtion takes and returns must be specified.
+    func{int; int, int} f  // Declares a variable f which is a function that takes two ints and returns an int.
+
+Operators
+This table lists the available operators and what types they take as arguments. All operators return the same type passed to them except for the equality and inequality operators (<, <=, >, >=, ==, !=) which return bool.
+
++
+-
+*
+/
+& (bitwise and)
+| (bitwise or)
+& (logical and)
+|| (logical or)
+<
+<=
+>
+>=
+==
+!=
+!
+int
+
+Type System
+Variables are statically typed. Once a variable is assigned a type, it can not be changed.
+
+Typecasting
+Int can be implicitly cast to floats when assigning to variables or passing to operators or functions. No other automatic typecasting or promotion is done.
+
+Anything can be converted to a string using the built in string() function.
+
+Binding
+Cb is statically bound. The compiler figures out what all identifiers mean at compile time.
+
+Variable Creation and Use
+Variables don't need to declared before use, but can be. This is only recommended for cases where the type can't be determined automatically. They can't be used until assigned to. Assignment is done with '='. An assignment statement can have one or more values per side although the same number must be on each side. If more than one is given, they are comma separated.
+
+There are no global or static variables.
+
+Functions
+Functions are called using the () syntax. A function may be called by name, or a func variable may be called.
+    add_one(int i):
+        return i + 1
+
+    int main():
+        add_one(5)
+        f = add_one
+        f(4)
+        return 0
+
+Functions take 0 or more arguments and return 0 or more values.
+    foo(int a):
+        ...
+or
+    int, char bar():
+        return 5, 'a'
+
+Arguments are passed with copy semantics.
+
+There is no function overloading.
+
+Functions must be declared before being used. Recursion is allowed.
+
+Functions can only be declared at the top level of the source code. Ie, not within other functions.
+
+Exceptions
+Functions can throw exceptions which causes cascading "returns" of the exception until a catch is found. Exceptions are ints. If an exception is not caught, the program terminates. If an exception is caught, the int thrown is assigned to the variable specified in the catch statement.
+
+    foo(int x):
+        try:
+            bar(x)
+            return 0
+        catch e:
+           return 1
+
+    bar(int x):
+        throw 1
+
+Namespace
+There is one namespace for all functions, variables, and types.
+
+I/O
+Done with
+    out(char c), err(char c)
+and
+    char in()
