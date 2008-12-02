@@ -82,7 +82,7 @@ for line in test_file:
         code = ""
     elif line.startswith("... "):
         test_count += 1
-        correct_result = line[4:-1]
+        correct_result = line.strip("\n")[4:]
         if (run_test(compiler, code, correct_result)):
             pass_count += 1
     else:

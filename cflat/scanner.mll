@@ -1,74 +1,36 @@
-let whitespace = [' ' '\t']
-let newline = '\n' | "\r\n"
-let digit = ['0'-'9']
-let integer = digit+
-let alpha = ['_' 'a'-'z' 'A'-'Z']
-let alphanum = [alpha digit]
-let identifier = alpha alphanum*
+{ open Parser }
 
 rule token = parse
-  whitespace		{ token lexbuf }
-| "//" _* newline	{ token lexbuf }
-(* /* */ comments ?*)
+  [' ' '\t' '\r' '\n'] { token lexbuf }
+| "/*"     { comment lexbuf }
+| '('      { LPAREN }
+| ')'      { RPAREN }
+| '{'      { LBRACE }
+| '}'      { RBRACE }
+| ';'      { SEMI }
+| ','      { COMMA }
+| '+'      { PLUS }
+| '-'      { MINUS }
+| '*'      { TIMES }
+| '/'      { DIVIDE }
+| '='      { ASSIGN }
+| "=="     { EQ }
+| "!="     { NEQ }
+| '<'      { LT }
+| "<="     { LEQ }
+| ">"      { GT }
+| ">="     { GEQ }
+| "if"     { IF }
+| "else"   { ELSE }
+| "for"    { FOR }
+| "while"  { WHILE }
+| "return" { RETURN }
+| "int"    { INT }
+| ['0'-'9']+ as lxm { LITERAL(int_of_string lxm) }
+| ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
+| eof { EOF }
+| _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 
-
-(* arithmetic operators *)
-| "++"			{ INCREMENT }
-| "--"			{ DECREMENT }
-| "-="			{ MINUS_ASSIGN }
-| "+="			{ PLUS_ASSIGN }
-| "*="			{ TIMES_ASSIGN }
-| "/="			{ DIVIDE_ASSIGN }
-| "%="			{ MODULO_ASSIGN }
-| '-'			{ MINUS }
-| '+'			{ PLUS }
-| '*'			{ TIMES }
-| '/'			{ DIVIDE }
-| '%'			{ MODULO }
-
-(* bitwise operators *)
-| "<<="			{ LEFT_SHIFT_ASSIGN }
-| ">>="			{ RIGHT_SHIFT_ASSIGN }
-| "&="			{ BITWISE_AND_ASSIGN }
-| "|="			{ BITWISE_OR_ASSIGN }
-| "^="			{ BITWISE_XOR_ASSIGN }
-| "<<"			{ LEFT_SHIFT }
-| ">>"			{ RIGHT_SHIFT }
-| "~"			{ BITWISE_NOT }
-| "&[^&]"		{ BITWISE_AND }
-| "|[^|]"		{ BITWISE_OR }
-| "^"			{ BITWISE_XOR }
-
-(* comparison operators *)
-| "<="			{ LESS_EQUAL }
-| ">="			{ GREATER_EQUAL }
-| "!="			{ NOT_EQUAL }
-| "=="			{ EQUAL }
-| "!"			{ NOT }
-| "&&"			{ AND }
-| "||"			{ OR }
-| '<'			{ LESS }
-| '>'			{ GREATER }
-
-| '='			{ ASSIGN }
-
-(* more operators *)
-
-| '('			{ LEFT_PARENTHESIS }
-| ')'			{ RIGHT_PARENTHESIS }
-
-| '{'			{ LEFT_CURLY_BRACKET }
-| '}'			{ RIGHT_CURLY_BRACKET }
-
-| ';'			{ SEMI_COLON }
-| ','			{ COMMA }
-
-(* keywords *)
-| "for"			{ FOR }
-| "while"		{ WHILE }
-| "if"			{ IF }
-| "else"		{ ELSE }
-| "goto"		{ GOTO }
-| "return"		{ RETURN }
-| integer as lit 	{ LITERAL(lit) }
-| identifier as id	{ IDENTIFIER(id) }
+and comment = parse
+  "*/" { token lexbuf }
+| _    { comment lexbuf }

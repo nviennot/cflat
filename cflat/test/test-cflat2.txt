@@ -1,0 +1,92 @@
+# The first line that doesn't start with a '#' should be the compiler command.
+# It should read source code from stdin and produce an executable named
+# 'temp.exe'.
+bash -c '(./microc > temp.s && gcc -m32 -c temp.s -o temp.o && gcc -m32 temp.o lib.o -o temp.exe)'
+
+After the compiler command, anything not within a test case (surrounded by ...)
+is ignored.
+The closing ... should be followed by a space and then the desired result of the
+test:
+* OK if the code should compile,
+* BAD if the code shouldn't compile, or
+* Any other single line string which the code, when run, should produce.
+  Whitespace may be trimmed from the front or back.
+
+
+Whitespace tests
+
+...
+main() {
+}
+... OK
+
+...
+main() {
+	bad
+}
+... BAD
+
+...
+main() {
+	out(123);
+}
+... 123
+
+...
+main() {
+	if (1)  out(1);
+	else    out(2);
+}
+... 1
+
+...
+main() {
+	if (0) out(1);
+	else   out(2);
+}
+... 2
+
+...
+func(a) {
+	out (a);
+}
+
+main() {
+	func(1);
+}
+... 1
+
+...
+main() {
+	int a;
+	int b;
+	a = 2;
+	b = 3;
+	out (a+b);
+}
+... 5
+
+...
+main() {
+	int i;
+	int sum;
+
+	sum = 0;
+	for (i = 0; i <= 10; i=i+1)
+		sum = sum + i;
+	out(sum);
+}
+... 55
+
+...
+func(a) {
+	a-1;
+}
+main() {
+	int a;
+	a = 10;
+	while(func(a))
+		a = func(a);
+	out(a);
+}
+... 1
