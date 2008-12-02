@@ -9,7 +9,6 @@ fib \
 for1 \
 func1 \
 gcd \
-global1 \
 hello \
 if1 \
 if2 \
