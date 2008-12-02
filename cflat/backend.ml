@@ -116,25 +116,3 @@ let generate_asm (vars, funcs) =
   "        .intel_syntax\n        .text\n        .intel_syntax noprefix\n" ^
   String.concat "\n" (List.map string_of_fdecl funcs) ^
   "        .ident  \"C Flat compiler 0.1\"\n        .section        .note.GNU-stack,\"\",@progbits\n"
-
-
-
-(*
-main() {
-    x = 2;
-    foo(x + 3);
-    return 0;
-}
-
-.globl main
-        .type   main, @function
-main:
-        push    ebp
-        mov     ebp, esp
-
-
-
-        pop ebp
-        ret
-        .size   main, .-main
-*)
