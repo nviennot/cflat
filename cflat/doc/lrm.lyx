@@ -1,0 +1,1278 @@
+#LyX 1.6.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass article
+\use_default_options false
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 0
+\use_esint 0
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\leftmargin 2cm
+\topmargin 2cm
+\rightmargin 2cm
+\bottommargin 3cm
+\headheight 2cm
+\headsep 2cm
+\footskip 2cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\bulletLaTeX 0 " "
+\bulletLaTeX 1 " "
+\bulletLaTeX 2 " "
+\bulletLaTeX 3 " "
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+Nicolas Viennot - nv2159
+\begin_inset space \hfill{}
+\end_inset
+
+2/12/08
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\size larger
+COMS W4115 - ltc Reference Manual
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+The ltc language is a subset of the C language.
+ Some of the core functionalities of C has been stripped: there is no preprocess
+or, no structs, no strings, not even pointers.
+ ltc goal is purely educational.
+ This document is inspired from the C Reference Manuel by Dennis Ritchie.
+\end_layout
+
+\begin_layout Section
+Lexical conventions
+\end_layout
+
+\begin_layout Subsection
+Whitespace
+\end_layout
+
+\begin_layout Standard
+A tab, a space or a new line is a whitespace.
+ At least one of these charaters is required to separate adjacent identifiers,
+ constants, and certain oparator-pairs.
+\end_layout
+
+\begin_layout Subsection
+Comments
+\end_layout
+
+\begin_layout Standard
+There are two ways to place comments: 
+\begin_inset Formula $\texttt{//}$
+\end_inset
+
+ introduces a comment which ends with a end of line.
+ 
+\begin_inset Formula $\texttt{/*}$
+\end_inset
+
+ also introduces a comment which ends with 
+\begin_inset Formula $\texttt{*/}$
+\end_inset
+
+, they can be nested.
+\end_layout
+
+\begin_layout Subsection
+Identifiers
+\end_layout
+
+\begin_layout Standard
+An identifier is a sequence of letters and digits.
+ The first charater must be alphabetic.
+ The underscore counts as alphabetic.
+ An identifier is case sensitive.
+\end_layout
+
+\begin_layout Subsection
+Keywords
+\end_layout
+
+\begin_layout Standard
+The following identifiers are keywords:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\texttt{goto return break continue if else for while}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Constants
+\end_layout
+
+\begin_layout Standard
+There is only one kind of constant: a 32 bits signed integer.
+ Such a constant is a sequence of digits represented in its decimal form.
+\end_layout
+
+\begin_layout Section
+Statements
+\end_layout
+
+\begin_layout Standard
+Statements are executed in sequence.
+\end_layout
+
+\begin_layout Subsection
+Expression statement
+\end_layout
+
+\begin_layout Standard
+Most statement are expression statements, which have the form
+\end_layout
+
+\begin_layout Standard
+expression 
+\begin_inset Formula $\texttt{;}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Compound statement
+\end_layout
+
+\begin_layout Standard
+So that several statements can be used where one is expected, the compound
+ statement is provided:
+\end_layout
+
+\begin_layout Itemize
+compound-statement:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Formula $\texttt{\{}$
+\end_inset
+
+ statement-list 
+\begin_inset Formula $\texttt{\}}$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+statement-list:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+statement
+\end_layout
+
+\begin_layout Itemize
+statement statement-list
+\end_layout
+
+\end_deeper
+\begin_layout Subsection
+Conditional statement
+\end_layout
+
+\begin_layout Standard
+The two forms of the conditional statement are
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{if (}$
+\end_inset
+
+ expression 
+\begin_inset Formula $\texttt{)}$
+\end_inset
+
+ statement
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{if (}$
+\end_inset
+
+ expression 
+\begin_inset Formula $\texttt{)}$
+\end_inset
+
+ statement 
+\begin_inset Formula $\texttt{else}$
+\end_inset
+
+ statement
+\end_layout
+
+\begin_layout Standard
+In both cases the expression is evaluated and if it is non-zero, the first
+ substatement is executed.
+ In the second case the second substatement is executed if the expression
+ is 0.
+ As usual the 
+\begin_inset Quotes eld
+\end_inset
+
+else
+\begin_inset Quotes erd
+\end_inset
+
+ ambiguity is resolved by connecting an 
+\begin_inset Formula $\texttt{else}$
+\end_inset
+
+ with the last encountered elseless 
+\begin_inset Formula $\texttt{if}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+While statement
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Formula $\texttt{while}$
+\end_inset
+
+ statement has the form
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{while (}$
+\end_inset
+
+ expression 
+\begin_inset Formula $\texttt{)}$
+\end_inset
+
+ statement
+\end_layout
+
+\begin_layout Standard
+The substatement is executed repeatedly so long as the value of the expression
+ remains non-zero.
+ The test takes place before each execution of the statement.
+\end_layout
+
+\begin_layout Subsection
+For statement
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Formula $\texttt{for}$
+\end_inset
+
+ statement has the form
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{for (}$
+\end_inset
+
+ expression-1
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+ 
+\begin_inset Formula $\texttt{;}$
+\end_inset
+
+ expression-2
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+ 
+\begin_inset Formula $\texttt{;}$
+\end_inset
+
+ expression-3
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+ 
+\begin_inset Formula $\texttt{)}$
+\end_inset
+
+ statement
+\end_layout
+
+\begin_layout Standard
+This statement is equivalent to
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+expression-1
+\begin_inset Formula $\texttt{;}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{while (}$
+\end_inset
+
+ expression-2 
+\begin_inset Formula $\texttt{) \{}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $\qquad$
+\end_inset
+
+statement
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $\qquad$
+\end_inset
+
+expression-3
+\begin_inset Formula $\texttt{;}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{\}}$
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Any or all the expression may be dropped.
+ A missing expression-2 makes the implied 
+\begin_inset Formula $\texttt{while}$
+\end_inset
+
+ clause equivalent to 
+\begin_inset Quotes eld
+\end_inset
+
+while(1)
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Other missing expressions are simply dropped from the expansion above.
+\end_layout
+
+\begin_layout Subsection
+Break statement
+\end_layout
+
+\begin_layout Standard
+The statement
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{break;}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+casuses termination of the smallest enclosing 
+\begin_inset Formula $\texttt{while}$
+\end_inset
+
+ or 
+\begin_inset Formula $\texttt{for}$
+\end_inset
+
+ statement; control passes the the statement following the terminated statement.
+\end_layout
+
+\begin_layout Subsection
+Continue statement
+\end_layout
+
+\begin_layout Standard
+The statement
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{continue;}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+causes control to pass to the loop-continuation portion of the smallest
+ enclosing 
+\begin_inset Formula $\texttt{while}$
+\end_inset
+
+ or 
+\begin_inset Formula $\texttt{for}$
+\end_inset
+
+ statement; that is to the end of the loop.
+\end_layout
+
+\begin_layout Subsection
+Return statement
+\end_layout
+
+\begin_layout Standard
+A function returns to its caller by means of the 
+\begin_inset Formula $\texttt{return}$
+\end_inset
+
+ statement
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{return}$
+\end_inset
+
+ expression 
+\begin_inset Formula $\texttt{;}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The value of the expression is returned to the caller of the function.
+\end_layout
+
+\begin_layout Subsection
+Goto statement
+\end_layout
+
+\begin_layout Standard
+Control may be transferred unconditionally by means of the statement
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{goto}$
+\end_inset
+
+ identifier 
+\begin_inset Formula $\texttt{;}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The identifier should be a label.
+\end_layout
+
+\begin_layout Subsection
+Labelled statement
+\end_layout
+
+\begin_layout Standard
+Any statement may be preceded by label prefixes of the form
+\end_layout
+
+\begin_layout Itemize
+identifier 
+\begin_inset Formula $:$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+which serve to declare the identifier as a label.
+\end_layout
+
+\begin_layout Subsection
+Null statement
+\end_layout
+
+\begin_layout Standard
+The null statement has the form
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{;}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A null statement is useful to carry a label just before the 
+\begin_inset Quotes eld
+\end_inset
+
+}
+\begin_inset Quotes erd
+\end_inset
+
+ of a compound statement or to supply a null body to a looping statement
+ such as 
+\begin_inset Formula $\texttt{while}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Exceptions
+\end_layout
+
+\begin_layout Standard
+How Exceptions Work ------------------- When entering a try block, we push
+ an exception handling block onto the stack.
+ It contains in this order: 1) Frame (base) pointer 2) A pointer to the
+ previous EH block 3) Address of corresponding catch block We also store
+ the location of the most recent EH block in a global pointer.
+\end_layout
+
+\begin_layout Standard
+When an exception is thrown, we store the throw value in eax.
+ Then we use the global pointer to restore the frame pointer and stack pointer
+ of the catching function, restore the old value of the global pointer,
+ and jmp to the catch block.
+\end_layout
+
+\begin_layout Standard
+When the program leaves a try or catch block, it pops the EH block off the
+ stack.
+ 
+\end_layout
+
+\begin_layout Section
+Program definition
+\end_layout
+
+\begin_layout Standard
+A ltc program consists of a sequence of function definition.
+\end_layout
+
+\begin_layout Itemize
+program:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+function-definition
+\end_layout
+
+\begin_layout Itemize
+function-definition program
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+function-definition:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+identifier 
+\begin_inset Formula $\texttt{(}$
+\end_inset
+
+ parameter-list
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+ 
+\begin_inset Formula $\texttt{)}$
+\end_inset
+
+ 
+\begin_inset Formula $\{$
+\end_inset
+
+ statement-list 
+\begin_inset Formula $\texttt{\}}$
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+parameter-list:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+identifier
+\end_layout
+
+\begin_layout Itemize
+identifier 
+\begin_inset Formula $\texttt{,}$
+\end_inset
+
+ parameter-list
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+A simple exemple of a complete function definition:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{max (a, b, c) \{}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $\quad\texttt{m = a > b ? a : b;}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $\quad\texttt{return m > c ? m : c;}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $\texttt{\}}$
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Scope rules
+\end_layout
+
+\begin_layout Standard
+A complete runnable ltc program doesn't need to go 
+\end_layout
+
+\begin_layout Section
+Syntax Summary
+\end_layout
+
+\begin_layout Subsection
+Expressions
+\end_layout
+
+\begin_layout Itemize
+expression:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+identifier
+\end_layout
+
+\begin_layout Itemize
+constant
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{(}$
+\end_inset
+
+ expression 
+\begin_inset Formula $\texttt{)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+identifier 
+\begin_inset Formula $\texttt{(}$
+\end_inset
+
+ expression-list
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+ 
+\begin_inset Formula $\texttt{)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{-}$
+\end_inset
+
+expression
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{!}$
+\end_inset
+
+expression
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\sim$
+\end_inset
+
+expression
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{++}$
+\end_inset
+
+identifier
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{--}$
+\end_inset
+
+identifier
+\end_layout
+
+\begin_layout Itemize
+identifier
+\begin_inset Formula $\texttt{++}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+identifier
+\begin_inset Formula $\texttt{--}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+expression binop expression
+\end_layout
+
+\begin_layout Itemize
+expression 
+\begin_inset Formula $\texttt{?}$
+\end_inset
+
+ expression 
+\begin_inset Formula $\texttt{:}$
+\end_inset
+
+ expression
+\end_layout
+
+\begin_layout Itemize
+identifier asgnop expression
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+expression-list:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+expression
+\end_layout
+
+\begin_layout Itemize
+expression 
+\begin_inset Formula $\texttt{,}$
+\end_inset
+
+ expression-list
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+The operator 
+\begin_inset Formula $\texttt{()}$
+\end_inset
+
+ has highest priority.
+\begin_inset Newline newline
+\end_inset
+
+The unary operators 
+\begin_inset Formula $\texttt{- ! }\sim\texttt{ ++ --}$
+\end_inset
+
+ have higher priority than binary operator, and group right to left.
+\begin_inset Newline newline
+\end_inset
+
+Binary operators and the conditional operator all group left to right and
+ have priority decreasing as indicated:
+\end_layout
+
+\begin_layout Itemize
+binop:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Formula $\texttt{* / \%}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{+ -}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{>> <<}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{< > <= >=}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{== !=}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\wedge$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{|}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{\&\&}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{||}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{? :}$
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+Assignment operator all have the same priority, and all group right to left.
+\end_layout
+
+\begin_layout Itemize
+asnop:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Formula $\texttt{= =+ =- =* =/ =\%=>> =<< =\&=}\wedge\texttt{ =}$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+The comma operator has the lowest priority, and groups left to right.
+\end_layout
+
+\begin_layout Subsection
+Statements
+\end_layout
+
+\begin_layout Itemize
+statement:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+expression 
+\begin_inset Formula $\texttt{;}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{\{}$
+\end_inset
+
+ statement-list 
+\begin_inset Formula $\texttt{\}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{if (}$
+\end_inset
+
+ expression 
+\begin_inset Formula $\texttt{)}$
+\end_inset
+
+ statement
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{if (}$
+\end_inset
+
+ expression 
+\begin_inset Formula $\texttt{)}$
+\end_inset
+
+ statement 
+\begin_inset Formula $\texttt{else}$
+\end_inset
+
+ statement
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{while (}$
+\end_inset
+
+ expression 
+\begin_inset Formula $\texttt{)}$
+\end_inset
+
+ statement
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{for (}$
+\end_inset
+
+ expression
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+ 
+\begin_inset Formula $\texttt{;}$
+\end_inset
+
+ expression
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+ 
+\begin_inset Formula $\texttt{;}$
+\end_inset
+
+ expression
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+ 
+\begin_inset Formula $\texttt{)}$
+\end_inset
+
+ statement
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{break;}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{continue;}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{return}$
+\end_inset
+
+ expression 
+\begin_inset Formula $\texttt{;}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{goto}$
+\end_inset
+
+ identifier 
+\begin_inset Formula $\texttt{;}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+identifier 
+\begin_inset Formula $:$
+\end_inset
+
+ statement
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{;}$
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+statement-list:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+statement
+\end_layout
+
+\begin_layout Itemize
+statement statement-list
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Subsection
+Program definition
+\end_layout
+
+\begin_layout Itemize
+program:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+function-definition
+\end_layout
+
+\begin_layout Itemize
+function-definition program
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+function-definition:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+identifier 
+\begin_inset Formula $\texttt{(}$
+\end_inset
+
+ parameter-list
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+ 
+\begin_inset Formula $\texttt{)}$
+\end_inset
+
+ 
+\begin_inset Formula $\{$
+\end_inset
+
+ statement-list 
+\begin_inset Formula $\texttt{\}}$
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+parameter-list:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+identifier
+\end_layout
+
+\begin_layout Itemize
+identifier 
+\begin_inset Formula $\texttt{,}$
+\end_inset
+
+ parameter-list
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\end_body
+\end_document
