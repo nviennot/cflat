@@ -1,0 +1,9 @@
+*.cmo
+*.cmi
+*.o
+*.s
+a.out
+microc
+parser.ml
+parser.mli
+scanner.ml
