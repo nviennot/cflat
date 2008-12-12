@@ -34,6 +34,14 @@ main() {
 
 ...
 main() {
+	out(1);
+	/* out(2); /* out(3); */ */
+	out(4);
+}
+... 1 4
+
+...
+main() {
 	if (1)  out(1);
 	else    out(2);
 }
