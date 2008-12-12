@@ -46,6 +46,9 @@ main() {
 }
 ... 2
 
+
+Dynamic labels
+
 ...
 main() {
 	if (0) out(1);
@@ -53,6 +56,22 @@ main() {
 	else out (3);
 }
 ... 2
+
+...
+main() {
+	int i;
+	int j;
+	for (i = 0; i < 2; i = i + 1) {
+		while (0) {
+		}
+		for (j = 0; j < 2; j = j + 1) {
+			out (i + j);
+		}
+	}
+}
+... 0 1 1 2
+
+-------------------
 
 ...
 func(a) {
@@ -108,3 +127,60 @@ main() {
 	out(a);
 }
 ... 1
+
+...
+main () {
+	if (1) {
+		break;
+	}
+}
+... BAD
+
+...
+main () {
+	break;
+}
+... BAD
+
+...
+break;
+main () {
+}
+... BAD
+
+...
+main () {
+	int i;
+	for (i = 0; i < 10; i = i + 1) {
+		break;
+		out(3);
+	}
+	out(5);
+}
+... 5
+
+...
+main () {
+	int i;
+	for (i = 0; i < 10; i = i + 1) {
+		if (i > 2) {
+			break;
+		}
+		out(3);
+	}
+	out(5);
+}
+... 3 3 3 5
+
+...
+main () {
+	int i;
+	for (i = 0; i < 4; i = i + 1) {
+		if (i == 1) {
+			continue;
+		}
+		out(3);
+	}
+	out(5);
+}
+... 3 3 3 5

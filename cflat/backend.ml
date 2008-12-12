@@ -3,17 +3,19 @@ open Printf
 
 type context_t = {
   label_count : int ref;
-(*	break_label : int;
-  continue_label : int;*)
+  break_label : string option;
+  continue_label : string option;
+  return_label : string option;
 }
-
-let get_label_name label_count =
-  ".L" ^ (string_of_int label_count)
 
 let get_new_label context =
   let l = !(context.label_count) in
   context.label_count := l + 1;
-  l
+  ".L" ^ (string_of_int l)
+
+let get = function
+  Some(x) -> x
+| None -> ""
 
 let rec index_of item n = function
      [] -> -1
@@ -79,10 +81,12 @@ let rec string_of_stmt context fdecl = function
     Block(stmts) ->
       String.concat "" (List.map (string_of_stmt context fdecl) stmts)
   | Expr(expr) -> eval_expr_to_eax fdecl expr
-  | Return(expr) -> eval_expr_to_eax fdecl expr ^ "jmp " ^ fdecl.fname ^ "_exit\n"
+  | Return(expr) ->
+	eval_expr_to_eax fdecl expr ^
+	"jmp " ^ (get context.return_label) ^ "\n"
   | If(e, s1, s2) ->
-      let l1 = get_label_name (get_new_label context)
-      and l2 = get_label_name (get_new_label context) in
+      let l1 = get_new_label context
+      and l2 = get_new_label context in
       String.concat "\n" [
       eval_expr_to_eax fdecl e;
       "test eax, eax";
@@ -94,23 +98,31 @@ let rec string_of_stmt context fdecl = function
       l2 ^ ":"] ^ "\n"
 
   | For(e1, e2, e3, s) ->
+	let l1 = get_new_label context
+	and l2 = get_new_label context
+	and l3 = get_new_label context in
+	let context' = { context with continue_label = Some l2;
+			 break_label = Some l3 } in
 	eval_expr_to_eax fdecl e1 ^
-	"jmp loop_first\n" ^
-	"loop:\n" ^
+	"jmp " ^ l1 ^ "\n" ^
+	l2 ^ ":\n" ^
 	eval_expr_to_eax fdecl e3 ^
-	"loop_first:\n" ^
+	l1 ^ ":\n" ^
 	eval_expr_to_eax fdecl e2 ^
 	"test eax, eax\n" ^
-	"jz loop_end\n" ^
-	string_of_stmt context fdecl s ^
-	"jmp loop\n" ^
-	"loop_end:\n"
+	"jz " ^ l3 ^ "\n" ^
+	string_of_stmt context' fdecl s ^
+	"jmp " ^ l2 ^ "\n" ^
+	l3 ^ ":\n"
 
   | While(e, s) -> string_of_stmt context fdecl (For(Noexpr, e, Noexpr, s))
+  | Break -> "jmp " ^ get context.break_label ^ "\n"
+  | Continue -> "jmp " ^ get context.continue_label ^ "\n"
 
 let string_of_vdecl id = "int " ^ id ^ ";\n"
 
 let string_of_fdecl context fdecl =
+let context' = { context with return_label = Some (get_new_label context) } in
   ".globl " ^ fdecl.fname ^ "\n" ^
   "        .type   " ^ fdecl.fname ^ ", @function\n" ^
   fdecl.fname ^ ":\n" ^
@@ -119,8 +131,8 @@ let string_of_fdecl context fdecl =
   "        sub     esp, " ^ (string_of_int (4 * (List.length fdecl.locals))) ^ "\n" ^
   "        push    ecx\n" ^
   "        push    edx\n" ^
-  String.concat "" (List.map (string_of_stmt context fdecl) fdecl.body) ^
-  fdecl.fname ^ "_exit:\n" ^
+  String.concat "" (List.map (string_of_stmt context' fdecl) fdecl.body) ^
+  get context'.return_label ^ ":\n" ^
   "        pop     edx\n" ^
   "        pop     ecx\n" ^
   "        mov     esp, ebp\n" ^
@@ -128,7 +140,10 @@ let string_of_fdecl context fdecl =
   "        ret\n"
 
 let generate_asm (vars, funcs) =
-  let context = { label_count = ref 0 } in
+  let context = { label_count = ref 0;
+                  continue_label = None;
+                  break_label = None;
+                  return_label = None} in
   "        .intel_syntax\n        .text\n        .intel_syntax noprefix\n" ^
   String.concat "\n" (List.map (string_of_fdecl context) funcs) ^
   "        .ident  \"C Flat compiler 0.1\"\n        .section        .note.GNU-stack,\"\",@progbits\n"

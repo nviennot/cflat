@@ -3,7 +3,7 @@
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA
 %token PLUS MINUS TIMES DIVIDE ASSIGN
 %token EQ NEQ LT LEQ GT GEQ
-%token RETURN IF ELSE FOR WHILE INT
+%token RETURN IF ELSE FOR WHILE INT BREAK CONTINUE
 %token <int> LITERAL
 %token <string> ID
 %token EOF
@@ -62,6 +62,8 @@ stmt:
   | FOR LPAREN expr_opt SEMI expr_opt SEMI expr_opt RPAREN stmt
      { For($3, $5, $7, $9) }
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
+  | BREAK SEMI { Break }
+  | CONTINUE SEMI { Continue }
 
 expr_opt:
     /* nothing */ { Noexpr }
