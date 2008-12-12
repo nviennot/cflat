@@ -11,3 +11,5 @@ void out(int val)
 {
 	printf("%d\n", val);
 }
+
+void *exception_ptr;

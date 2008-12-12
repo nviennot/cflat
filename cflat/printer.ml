@@ -3,13 +3,29 @@ open Ast
 let rec string_of_expr = function
     Literal(l) -> string_of_int l
   | Id(s) -> s
+  | Unop(o, e) ->
+      (match o with
+        Not -> "!" | Bw_not -> "~" | Plus -> "+" | Minus -> "-"
+      | Pre_inc -> "++" | Pre_dec -> "--" | _ -> "") ^
+      string_of_expr e ^
+      (match o with Post_inc -> "++" | Post_dec -> "--"  | _ -> "")
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^
       (match o with
-	Add -> "+" | Sub -> "-" | Mult -> "*" | Div -> "/"
+        Add -> "+" | Sub -> "-" | Mult -> "*" | Div -> "/" | Modulo -> "%"
+      | Or -> "||" | And -> "&&" | Bw_or -> "|" | Bw_and -> "&" | Bw_xor -> "^"
+      | Lshift -> "<<" | Rshift -> ">>"
       | Equal -> "==" | Neq -> "!="
       | Less -> "<" | Leq -> "<=" | Greater -> ">" | Geq -> ">=") ^ " " ^
       string_of_expr e2
+  | Assignop(v, o, e) ->
+      v ^ " " ^
+      (match o with
+          Add_assign -> "+" | Sub_assign -> "-" | Mult_assign -> "*"
+        | Div_assign -> "/" | Modulo_assign -> "%" | Bw_or_assign -> "|"
+        | Bw_and_assign -> "&" | Bw_xor_assign -> "^"
+        | Lshift_assign -> "<<" | Rshift_assign -> ">>") ^
+      "= " ^ string_of_expr e
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
@@ -29,6 +45,12 @@ let rec string_of_stmt = function
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
   | Break -> "break"
   | Continue -> "continue"
+  | Try_catch(s1, Noexpr, s2) ->
+      "try\n" ^ string_of_stmt s1 ^
+      "catch\n" ^ string_of_stmt s2
+  | Try_catch(s1, e, s2) ->
+      "try\n" ^ string_of_stmt s1 ^
+      "catch (" ^ string_of_expr e ^ ")\n" ^ string_of_stmt s2
 
 let string_of_vdecl id = "int " ^ id ^ ";\n"
 
