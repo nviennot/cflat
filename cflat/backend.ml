@@ -1,6 +1,19 @@
 open Ast
 open Printf
 
+type context_t = {
+  label_count : int ref;
+(*	break_label : int;
+  continue_label : int;*)
+}
+
+let get_label_name label_count =
+  ".L" ^ (string_of_int label_count)
+
+let get_new_label context =
+  let l = !(context.label_count) in
+  context.label_count := l + 1;
+  l
 
 let rec index_of item n = function
      [] -> -1
@@ -62,21 +75,23 @@ let rec eval_expr_to_eax fdecl = function
 	sprintf "add esp, %d\n" (4 * (List.length el))
   | Noexpr -> ""
 
-let rec string_of_stmt fdecl = function
+let rec string_of_stmt context fdecl = function
     Block(stmts) ->
-      String.concat "" (List.map (string_of_stmt fdecl) stmts)
+      String.concat "" (List.map (string_of_stmt context fdecl) stmts)
   | Expr(expr) -> eval_expr_to_eax fdecl expr
   | Return(expr) -> eval_expr_to_eax fdecl expr ^ "jmp " ^ fdecl.fname ^ "_exit\n"
   | If(e, s1, s2) ->
+      let l1 = get_label_name (get_new_label context)
+      and l2 = get_label_name (get_new_label context) in
       String.concat "\n" [
       eval_expr_to_eax fdecl e;
       "test eax, eax";
-      "jz else";
-      (string_of_stmt fdecl s1);
-      "jmp endif";
-      "else:";
-      (string_of_stmt fdecl s2);
-      "endif:"] ^ "\n"
+      "jz " ^ l1;
+      (string_of_stmt context fdecl s1);
+      "jmp " ^ l2;
+      l1 ^ ":";
+      (string_of_stmt context fdecl s2);
+      l2 ^ ":"] ^ "\n"
 
   | For(e1, e2, e3, s) ->
 	eval_expr_to_eax fdecl e1 ^
@@ -87,15 +102,15 @@ let rec string_of_stmt fdecl = function
 	eval_expr_to_eax fdecl e2 ^
 	"test eax, eax\n" ^
 	"jz loop_end\n" ^
-	string_of_stmt fdecl s ^
+	string_of_stmt context fdecl s ^
 	"jmp loop\n" ^
 	"loop_end:\n"
 
-  | While(e, s) -> string_of_stmt fdecl (For(Noexpr, e, Noexpr, s))
+  | While(e, s) -> string_of_stmt context fdecl (For(Noexpr, e, Noexpr, s))
 
 let string_of_vdecl id = "int " ^ id ^ ";\n"
 
-let string_of_fdecl fdecl =
+let string_of_fdecl context fdecl =
   ".globl " ^ fdecl.fname ^ "\n" ^
   "        .type   " ^ fdecl.fname ^ ", @function\n" ^
   fdecl.fname ^ ":\n" ^
@@ -104,7 +119,7 @@ let string_of_fdecl fdecl =
   "        sub     esp, " ^ (string_of_int (4 * (List.length fdecl.locals))) ^ "\n" ^
   "        push    ecx\n" ^
   "        push    edx\n" ^
-  String.concat "" (List.map (string_of_stmt fdecl) fdecl.body) ^
+  String.concat "" (List.map (string_of_stmt context fdecl) fdecl.body) ^
   fdecl.fname ^ "_exit:\n" ^
   "        pop     edx\n" ^
   "        pop     ecx\n" ^
@@ -113,6 +128,7 @@ let string_of_fdecl fdecl =
   "        ret\n"
 
 let generate_asm (vars, funcs) =
+  let context = { label_count = ref 0 } in
   "        .intel_syntax\n        .text\n        .intel_syntax noprefix\n" ^
-  String.concat "\n" (List.map string_of_fdecl funcs) ^
+  String.concat "\n" (List.map (string_of_fdecl context) funcs) ^
   "        .ident  \"C Flat compiler 0.1\"\n        .section        .note.GNU-stack,\"\",@progbits\n"

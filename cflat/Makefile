@@ -27,12 +27,8 @@ microc : $(OBJS) lib.o
 	ocamlc -o microc $(OBJS)
 
 .PHONY : test
-test : main.c lib.c
-	./microc < main.c > main.s
-	gcc -m32 -c main.s -o main.o
-	gcc -m32 -c lib.c -o lib.o
-	gcc -m32 lib.o main.o -o test
-	./test
+test : microc test/compiler-tester.py test/test-cflat2.txt
+	test/compiler-tester.py test/test-cflat2.txt
 
 scanner.ml : scanner.mll
 	ocamllex scanner.mll
