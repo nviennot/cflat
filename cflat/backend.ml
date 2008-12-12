@@ -122,7 +122,7 @@ let rec string_of_stmt context fdecl = function
 let string_of_vdecl id = "int " ^ id ^ ";\n"
 
 let string_of_fdecl context fdecl =
-let context' = { context with return_label = Some (get_new_label context) } in
+  let context' = { context with return_label = Some (get_new_label context) } in
   ".globl " ^ fdecl.fname ^ "\n" ^
   "        .type   " ^ fdecl.fname ^ ", @function\n" ^
   fdecl.fname ^ ":\n" ^
