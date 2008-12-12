@@ -17,7 +17,7 @@ def compile_and_run(compiler, code):
     proc.tochild.close()
     if proc.wait() != 0:
         return ('BAD', proc.fromchild.read())
-    proc = Popen4('./temp.exe')
+    proc = Popen4('./temp.exe | xargs')
     return ('OK', proc.fromchild.read().strip())
 
 def print_indented(message):
