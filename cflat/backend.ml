@@ -80,6 +80,7 @@ let rec eval_expr_to_eax fdecl = function
                    "mov   eax, 0\n" ^
                    "setnz al\n" ^
                    "test  ecx, ecx\n" ^
+                   "mov   ecx, 0\n" ^
                    "setnz cl\n" ^
                    "and   eax, ecx\n"
 
@@ -124,17 +125,17 @@ let rec string_of_stmt context fdecl = function
       eval_expr_to_eax fdecl expr ^
       "jmp " ^ (get context.return_label) ^ "\n"
   | If(e, s1, s2) ->
-      let l1 = get_new_label context
-      and l2 = get_new_label context in
+      let else_label    = get_new_label context
+      and exit_if_label = get_new_label context in
       String.concat "\n" [
       eval_expr_to_eax fdecl e;
       "test eax, eax";
-      "jz " ^ l1;
+      "jz " ^ else_label;
       (string_of_stmt context fdecl s1);
-      "jmp " ^ l2;
-      l1 ^ ":";
+      "jmp " ^ exit_if_label;
+      else_label ^ ":";
       (string_of_stmt context fdecl s2);
-      l2 ^ ":"] ^ "\n"
+      exit_if_label ^ ":"] ^ "\n"
 
   | For(e1, e2, e3, s) ->
       let loop_begin_label = get_new_label context
@@ -176,26 +177,26 @@ let string_of_vdecl id = "int " ^ id ^ ";\n"
 let string_of_fdecl context fdecl =
   let context' = { context with return_label = Some (get_new_label context) } in
   ".globl " ^ fdecl.fname ^ "\n" ^
-  "        .type   " ^ fdecl.fname ^ ", @function\n" ^
+  ".type   " ^ fdecl.fname ^ ", @function\n" ^
   fdecl.fname ^ ":\n" ^
-  "        push    ebp\n" ^
-  "        mov     ebp, esp\n" ^
-  "        sub     esp, " ^ (string_of_int (4 * (List.length fdecl.locals))) ^ "\n" ^
-  "        push    ecx\n" ^
-  "        push    edx\n" ^
+  "push ebp\n" ^
+  "mov  ebp, esp\n" ^
+  "sub  esp, " ^ (string_of_int (4 * (List.length fdecl.locals))) ^ "\n" ^
+  "push ecx\n" ^
+  "push edx\n" ^
   String.concat "" (List.map (string_of_stmt context' fdecl) fdecl.body) ^
   get context'.return_label ^ ":\n" ^
-  "        pop     edx\n" ^
-  "        pop     ecx\n" ^
-  "        mov     esp, ebp\n" ^
-  "        pop     ebp\n" ^
-  "        ret\n"
+  "pop  edx\n" ^
+  "pop  ecx\n" ^
+  "mov  esp, ebp\n" ^
+  "pop  ebp\n" ^
+  "ret\n"
 
 let generate_asm (vars, funcs) =
   let context = { label_count = ref 0;
                   continue_label = None;
                   break_label = None;
                   return_label = None} in
-  "        .intel_syntax\n        .text\n        .intel_syntax noprefix\n" ^
+  ".intel_syntax\n        .text\n        .intel_syntax noprefix\n" ^
   String.concat "\n" (List.map (string_of_fdecl context) funcs) ^
-  "        .ident  \"C Flat compiler 0.1\"\n        .section        .note.GNU-stack,\"\",@progbits\n"
+  ".ident  \"C Flat compiler 0.1\"\n        .section        .note.GNU-stack,\"\",@progbits\n"
