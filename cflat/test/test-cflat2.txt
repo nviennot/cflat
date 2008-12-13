@@ -13,8 +13,7 @@ test:
   Whitespace may be trimmed from the front or back.
 
 
-Whitespace tests
-
+      *** compiling test ***
 ...
 main() {
 }
@@ -32,13 +31,16 @@ main() {
 }
 ... 123
 
+   *** Comments tests ***
 ...
 main() {
-	out(1);
-	/* out(2); /* out(3); */ */
-	out(4);
+  out(1);
+  /* out(2); /* out(3); */ // */
+  /* garbage */
+  out(4); // out(5); garbage
+  out(6);
 }
-... 1 4
+... 1 4 6
 
 ...
 main() {

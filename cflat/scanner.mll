@@ -10,8 +10,8 @@ let identifier	= alpha alphanum*
 
 rule token = parse
   whitespace            { token lexbuf }
-| "//" _* newline	{ token lexbuf }
-| "/*"			{ comment 0 lexbuf }
+| "//"          	{ comment_double_slash lexbuf }
+| "/*"			{ comment_slash_star 0 lexbuf }
 
 (* arithmetic operators *)
 | "++"			{ INC }
@@ -78,8 +78,12 @@ rule token = parse
 | eof			{ EOF }
 | _ as char		{ raise (Failure("illegal character " ^ Char.escaped char)) }
 
-and comment level = parse
+and comment_slash_star level = parse
   "*/" { if level = 0 then token lexbuf
-         else comment (level-1) lexbuf }
-| "/*" { comment (level+1) lexbuf }
-| _    { comment level lexbuf }
+         else comment_slash_star (level-1) lexbuf }
+| "/*" { comment_slash_star (level+1) lexbuf }
+| _    { comment_slash_star level lexbuf }
+
+and comment_double_slash = parse
+  newline       { token lexbuf }
+| _             { comment_double_slash lexbuf }
