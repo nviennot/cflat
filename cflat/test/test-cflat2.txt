@@ -194,8 +194,10 @@ main () {
 ... 3 3 3 5
 
 ...
-main () {
-	int i;
-	int i;
+f(a, b, c) { out(a); out(b); out(c); }
+g(a, b, c) { }
+main() {
+  f(1, 2, 3);
+  g(out(4), out(5), out(6));
 }
-... BAD
+... 1 2 3 4 5 6

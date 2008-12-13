@@ -112,9 +112,12 @@ let rec eval_expr_to_eax fdecl = function
   | Call(f, el) ->
       ( String.concat ""
       (let prepare_arg = fun e -> eval_expr_to_eax fdecl e ^ "push eax\n" in
-      (List.map prepare_arg (List.rev el))) ) ^
+      (List.map prepare_arg el))) ^
+      sprintf "push %d\n" (List.length el) ^
+      "call __reverse_args\n" ^
+      "add  esp, 4\n" ^
       sprintf "call %s\n" f ^
-      sprintf "add esp, %d\n" (4 * (List.length el))
+      sprintf "add  esp, %d\n" (4 * (List.length el))
   | Noexpr -> ""
 
 let rec string_of_stmt context fdecl = function
@@ -127,15 +130,14 @@ let rec string_of_stmt context fdecl = function
   | If(e, s1, s2) ->
       let else_label    = get_new_label context
       and exit_if_label = get_new_label context in
-      String.concat "\n" [
-      eval_expr_to_eax fdecl e;
-      "test eax, eax";
-      "jz " ^ else_label;
-      (string_of_stmt context fdecl s1);
-      "jmp " ^ exit_if_label;
-      else_label ^ ":";
-      (string_of_stmt context fdecl s2);
-      exit_if_label ^ ":"] ^ "\n"
+      (eval_expr_to_eax fdecl e) ^ "\n" ^
+      "test eax, eax\n" ^
+      "jz " ^ else_label ^ "\n" ^
+      (string_of_stmt context fdecl s1) ^ "\n" ^
+      "jmp " ^ exit_if_label ^ "\n" ^
+      else_label ^ ":\n" ^
+      (string_of_stmt context fdecl s2) ^ "\n" ^
+      exit_if_label ^ ":\n"
 
   | For(e1, e2, e3, s) ->
       let loop_begin_label = get_new_label context
