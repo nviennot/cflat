@@ -27,6 +27,10 @@ rule token = parse
 | '/'			{ DIVIDE }
 | '%'			{ MODULO }
 
+(* must be before the "|" and "&" *)
+| "&&"                  { AND }
+| "||"                  { OR }
+
 (* bitwise operators *)
 | "<<="			{ LSHIFT_ASSIGN }
 | ">>="			{ RSHIFT_ASSIGN }
@@ -36,18 +40,20 @@ rule token = parse
 | "<<"			{ LSHIFT }
 | ">>"			{ RSHIFT }
 | "~"			{ BW_NOT }
-| "&[^&]"		{ BW_AND }
-| "|[^|]"		{ BW_OR }
+| "&"	        	{ BW_AND }
+| "|"	        	{ BW_OR }
 | "^"			{ BW_XOR }
 
 (* logic operators *)
+(* done before
+| "&&"                  { AND }
+| "||"                  { OR }
+*)
 | "<="			{ LEQ }
 | ">="			{ GEQ }
 | "!="			{ NEQ }
 | "=="			{ EQ }
 | "!"			{ NOT }
-| "&&"			{ AND }
-| "||"			{ OR }
 | '<'			{ LT }
 | '>'			{ GT }
 
@@ -86,4 +92,4 @@ and comment_slash_star level = parse
 
 and comment_double_slash = parse
   newline       { token lexbuf }
-| _             { comment_double_slash lexbuf }
+| _             { comment_double_slash lexbuf}

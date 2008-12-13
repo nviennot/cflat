@@ -36,6 +36,10 @@ let rec eval_expr_to_eax fdecl = function
     Literal(l) -> sprintf "mov eax, %d\n" l
   | Id(s) -> sprintf "mov eax, [ebp+%d]\n" (id_to_offset fdecl s)
   | Unop(o, e) ->
+      (match (o, e) with
+        (Pre_inc, Id(s)) -> sprintf "inc dword ptr [ebp+%d]\n" (id_to_offset fdecl s)
+      | (Pre_dec, Id(s)) -> sprintf "dec dword ptr [ebp+%d]\n" (id_to_offset fdecl s)
+      | _ -> "") ^
       eval_expr_to_eax fdecl e ^
       (match o with
         Not      -> "test eax, eax\n" ^
@@ -44,10 +48,11 @@ let rec eval_expr_to_eax fdecl = function
       | Bw_not   -> "not eax\n"
       | Plus     -> ""
       | Minus    -> "neg eax\n"
-      | Pre_inc  -> "NOT_IMPL\n"
-      | Post_inc -> "NOT_IMPL\n"
-      | Pre_dec  -> "NOT_IMPL\n"
-      | Post_dec -> "NOT_IMPL\n")
+      | Pre_inc | Post_inc | Pre_dec | Post_dec -> "") ^
+      (match (o, e) with
+        (Post_inc, Id(s)) -> sprintf "inc dword ptr [ebp+%d]\n" (id_to_offset fdecl s)
+      | (Post_dec, Id(s)) -> sprintf "dec dword ptr [ebp+%d]\n" (id_to_offset fdecl s)
+      | _ -> "")
 
   | Binop(e1, o, e2) ->
       eval_expr_to_eax fdecl e1 ^

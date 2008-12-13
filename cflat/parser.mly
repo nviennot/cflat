@@ -136,13 +136,6 @@ expr:
     LITERAL          { Literal($1) }
   | ID               { Id($1) }
 
-  | NOT    expr { Unop(Not,      $2) }
-  | BW_NOT expr { Unop(Bw_not,   $2) }
-  | INC    expr { Unop(Pre_inc,  $2) }
-  | DEC    expr { Unop(Pre_dec,  $2) }
-  | expr   INC  { Unop(Post_inc, $1) }
-  | expr   DEC  { Unop(Post_dec, $1) }
-
   | expr OR       expr { Binop($1, Or,      $3) }
   | expr AND      expr { Binop($1, And,     $3) }
   | expr BW_OR    expr { Binop($1, Bw_or,   $3) }
@@ -161,6 +154,15 @@ expr:
   | expr LEQ      expr { Binop($1, Leq,     $3) }
   | expr GT       expr { Binop($1, Greater, $3) }
   | expr GEQ      expr { Binop($1, Geq,     $3) }
+
+  | NOT    expr { Unop(Not,      $2) }
+  | BW_NOT expr { Unop(Bw_not,   $2) }
+  | PLUS   expr { Unop(Plus,     $2) }
+  | MINUS  expr { Unop(Minus,    $2) }
+  | INC    expr { Unop(Pre_inc,  $2) }
+  | DEC    expr { Unop(Pre_dec,  $2) }
+  | expr   INC  { Unop(Post_inc, $1) }
+  | expr   DEC  { Unop(Post_dec, $1) }
  
   | ID BW_AND_ASSIGN expr { Assignop($1, Bw_and_assign, $3) }
   | ID BW_OR_ASSIGN  expr { Assignop($1, Bw_or_assign,  $3) }
