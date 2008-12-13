@@ -22,8 +22,3 @@ asmlinkage void __reverse_args(int n) {
 }
 
 void *__exception_ptr;
-
-asmlinkage void __unwind_exception_stack(int n) {
-  while(n--)
-    __exception_ptr = *(void **)__exception_ptr;
-}

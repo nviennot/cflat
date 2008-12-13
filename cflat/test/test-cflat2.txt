@@ -315,10 +315,21 @@ main () {
 }
 ... 3 3 3 5
 
+
    *** Exceptions ***
 ...
+/* nested try/catch */
+g() {
+  throw 4;
+}
 f() {
-  throw 3;
+  int b;
+  try {
+    g();
+  } catch (b) {
+    out(b);
+    throw b-1;
+  }
 }
 main() {
   int a;
@@ -329,6 +340,48 @@ main() {
   } catch (a) {
     out(a);
   }
-  out(4);
+  out(5);
 }
-... 1 3 4
+... 1 4 3 5
+
+...
+/* continue/break in a loop */
+main() {
+  int i;
+  for (i=0; i < 5; i++) {
+    try {
+      try {
+        if (i == 4)
+          throw 2;
+      } catch {
+        break;
+      }
+      if (i == 2)
+        continue;
+    } catch { }
+    out(i);
+  }
+  out(-1);
+}
+... 0 1 3 -1
+
+...
+/* return within a try */
+f() {
+  try {
+    return 0;
+  } catch {
+  }
+}
+
+main() {
+  int a;
+  try {
+    f();
+    throw 1;
+  } catch (a) {
+    out(a);
+  }
+  out(2);
+}
+... 1 2

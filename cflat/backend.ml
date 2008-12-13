@@ -2,10 +2,12 @@ open Ast
 open Printf
 
 type context_t = {
-  label_count : int ref;
-  break_label : string option;
-  continue_label : string option;
-  return_label : string option;
+  label_count        : int ref;
+  break_label        : string option;
+  continue_label     : string option;
+  return_label       : string option;
+  function_try_level : int;
+  loop_try_level     : int;
 }
 
 let get_new_label context =
@@ -31,6 +33,36 @@ let id_to_offset fdecl id =
       -4 * (n+1)
     else
       raise (Failure ("undefined identifier " ^ id))
+
+(*
+exception stack looks like this:
+    struct exception {
+      struct exception *next;
+      void *catch_address;
+      int  old_ebp;
+      int  old_esp;
+    };
+*)
+
+let exception_context_size = 16
+
+let stack_exception catch_label =
+  "lea eax, " ^ catch_label ^ "\n" ^
+  "push esp\n" ^
+  "push ebp\n" ^
+  "push eax\n" ^
+  "push dword ptr [__exception_ptr]\n" ^
+  "mov  [__exception_ptr], esp\n"
+
+let unstack_exception n =
+  sprintf "add esp, %d\n" (exception_context_size * n)
+
+let rec unwind_exception = function
+    0 -> ""
+  | n -> "mov eax, [__exception_ptr]\n" ^
+         "mov eax, [eax]\n" ^
+         "mov [__exception_ptr], eax\n" ^
+         unwind_exception (n-1)
 
 let rec eval_expr_to_eax fdecl = function
     Literal(l) -> sprintf "mov eax, %d\n" l
@@ -77,7 +109,6 @@ let rec eval_expr_to_eax fdecl = function
       | Modulo  -> "cdq\n" ^
                    "idiv  ecx\n" ^
                    "mov   eax, edx\n"
-
       | Or      -> "or    eax, ecx\n" ^
                    "mov   eax, 0\n" ^
                    "setnz al\n"
@@ -88,13 +119,11 @@ let rec eval_expr_to_eax fdecl = function
                    "mov   ecx, 0\n" ^
                    "setnz cl\n" ^
                    "and   eax, ecx\n"
-
       | Bw_or   -> "or    eax, ecx\n"
       | Bw_and  -> "and   eax, ecx\n"
       | Bw_xor  -> "xor   eax, ecx\n"
       | Lshift  -> "sal   eax, cl\n"
       | Rshift  -> "sar   eax, cl\n"
-
       | Equal   -> "sete  al\n"
       | Neq     -> "setne al\n"
       | Less    -> "setl  al\n"
@@ -130,6 +159,8 @@ let rec string_of_stmt context fdecl = function
       String.concat "" (List.map (string_of_stmt context fdecl) stmts)
   | Expr(expr) -> eval_expr_to_eax fdecl expr
   | Return(expr) ->
+      unwind_exception  context.function_try_level ^
+      unstack_exception context.function_try_level ^
       eval_expr_to_eax fdecl expr ^
       "jmp " ^ (get context.return_label) ^ "\n"
   | If(e, s1, s2) ->
@@ -149,7 +180,8 @@ let rec string_of_stmt context fdecl = function
       and loop_label       = get_new_label context
       and loop_exit_label  = get_new_label context in
       let context' = { context with continue_label = Some loop_label;
-                       break_label = Some loop_exit_label } in
+                                    break_label    = Some loop_exit_label;
+                                    loop_try_level = 0 } in
       eval_expr_to_eax fdecl e1 ^
       "jmp " ^ loop_begin_label ^ "\n" ^
       loop_label ^ ":\n" ^
@@ -165,34 +197,40 @@ let rec string_of_stmt context fdecl = function
       loop_exit_label ^ ":\n"
 
   | While(e, s) -> string_of_stmt context fdecl (For(Noexpr, e, Noexpr, s))
-  | Break -> "jmp " ^ get context.break_label ^ "\n"
-  | Continue -> "jmp " ^ get context.continue_label ^ "\n"
+  | Break ->
+      unwind_exception  context.loop_try_level ^
+      unstack_exception context.loop_try_level ^
+      "jmp " ^ get context.break_label ^ "\n"
+  | Continue ->
+      unwind_exception  context.loop_try_level ^
+      unstack_exception context.loop_try_level ^
+      "jmp " ^ get context.continue_label ^ "\n"
   | Try_catch(s1, e, s2) ->
       let catch_label      = get_new_label context
       and exit_label       = get_new_label context in
-      "lea eax, " ^ catch_label ^ "\n" ^
-      "push esp\n" ^
-      "push ebp\n" ^
-      "push eax\n" ^
-      "push dword ptr [__exception_ptr]\n" ^
-      "mov  [__exception_ptr], esp\n" ^
-      string_of_stmt context fdecl s1 ^
+      stack_exception catch_label ^
+      let context' = { context with function_try_level = context.function_try_level + 1;
+                                    loop_try_level     = context.loop_try_level + 1} in
+        string_of_stmt context' fdecl s1 ^
+      unwind_exception 1 ^
+      unstack_exception 1 ^
       "jmp " ^ exit_label ^ "\n" ^
       catch_label ^ ":\n" ^
       (match e with
         Noexpr -> ""
       | Id(v)  -> sprintf "mov [ebp+%d], eax\n" (id_to_offset fdecl v)
       | _      -> "ERROR\n") ^
-      eval_expr_to_eax fdecl (Call("__unwind_exception_stack", [Literal(1)])) ^
       string_of_stmt context fdecl s2 ^
       exit_label ^ ":\n"
 
   | Throw(e) ->
+      "push [__exception_ptr]\n" ^
+      unwind_exception 1 ^
       eval_expr_to_eax fdecl e ^
-      "mov ecx, [__exception_ptr]\n" ^
-      "mov esp, [ecx+12]\n" ^
-      "mov ebp, [ecx+8]\n" ^
-      "jmp [ecx+4]\n"
+      "pop  ecx\n" ^
+      "mov  esp, [ecx+12]\n" ^ (* exception is unstacked *)
+      "mov  ebp, [ecx+8]\n" ^
+      "jmp  [ecx+4]\n"
 
 let string_of_vdecl id = "int " ^ id ^ ";\n"
 
@@ -215,10 +253,12 @@ let string_of_fdecl context fdecl =
   "ret\n"
 
 let generate_asm (vars, funcs) =
-  let context = { label_count = ref 0;
-                  continue_label = None;
-                  break_label = None;
-                  return_label = None} in
-  ".intel_syntax\n        .text\n        .intel_syntax noprefix\n" ^
+  let context = { label_count        = ref 0;
+                  continue_label     = None;
+                  break_label        = None;
+                  return_label       = None;
+                  function_try_level = 0;
+                  loop_try_level     = 0 } in
+  ".intel_syntax\n.text\n.intel_syntax noprefix\n" ^
   String.concat "\n" (List.map (string_of_fdecl context) funcs) ^
-  ".ident  \"C Flat compiler 0.1\"\n        .section        .note.GNU-stack,\"\",@progbits\n"
+  ".ident \"C Flat compiler 0.1\"\n.section .note.GNU-stack,\"\",@progbits\n"
