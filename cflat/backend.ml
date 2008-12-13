@@ -35,7 +35,7 @@ let id_to_offset fdecl id =
       raise (Failure ("undefined identifier " ^ id))
 
 (*
-exception stack looks like this:
+an exception looks like this:
     struct exception {
       struct exception *next;
       void *catch_address;
@@ -157,12 +157,15 @@ let rec eval_expr_to_eax fdecl = function
 let rec string_of_stmt context fdecl = function
     Block(stmts) ->
       String.concat "" (List.map (string_of_stmt context fdecl) stmts)
+
   | Expr(expr) -> eval_expr_to_eax fdecl expr
+
   | Return(expr) ->
       unwind_exception  context.function_try_level ^
       unstack_exception context.function_try_level ^
       eval_expr_to_eax fdecl expr ^
       "jmp " ^ (get context.return_label) ^ "\n"
+
   | If(e, s1, s2) ->
       let else_label    = get_new_label context
       and exit_if_label = get_new_label context in
@@ -197,14 +200,17 @@ let rec string_of_stmt context fdecl = function
       loop_exit_label ^ ":\n"
 
   | While(e, s) -> string_of_stmt context fdecl (For(Noexpr, e, Noexpr, s))
+
   | Break ->
       unwind_exception  context.loop_try_level ^
       unstack_exception context.loop_try_level ^
       "jmp " ^ get context.break_label ^ "\n"
+
   | Continue ->
       unwind_exception  context.loop_try_level ^
       unstack_exception context.loop_try_level ^
       "jmp " ^ get context.continue_label ^ "\n"
+
   | Try_catch(s1, e, s2) ->
       let catch_label      = get_new_label context
       and exit_label       = get_new_label context in
