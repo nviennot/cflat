@@ -315,3 +315,20 @@ main () {
 }
 ... 3 3 3 5
 
+   *** Exceptions ***
+...
+f() {
+  throw 3;
+}
+main() {
+  int a;
+  out(1);
+  try {
+    f();
+    out(2);
+  } catch (a) {
+    out(a);
+  }
+  out(4);
+}
+... 1 3 4

@@ -30,6 +30,7 @@ type stmt =
   | Break
   | Continue
   | Try_catch of stmt * expr * stmt
+  | Throw of expr
 
 type func_decl = {
     fname : string;

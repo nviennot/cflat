@@ -27,7 +27,7 @@ microc original shit
 %token LSHIFT RSHIFT BW_NOT BW_AND BW_OR BW_XOR
 %token LEQ GEQ NEQ EQ NOT AND OR LT GT
 %token ASSIGN LPAREN RPAREN LBRACE RBRACE SEMI COMMA
-%token FOR WHILE IF ELSE GOTO RETURN INT BREAK CONTINUE TRY CATCH
+%token FOR WHILE IF ELSE GOTO RETURN INT BREAK CONTINUE TRY CATCH THROW
 %token <int> LITERAL
 %token <string> ID
 %token EOF
@@ -127,6 +127,7 @@ stmt:
   | CONTINUE SEMI { Continue }
   | TRY stmt CATCH LPAREN expr RPAREN stmt { Try_catch($2, $5, $7) }
   | TRY stmt CATCH stmt { Try_catch($2, Noexpr, $4) }
+  | THROW expr SEMI { Throw($2) }
 
 expr_opt:
     /* nothing */ { Noexpr }

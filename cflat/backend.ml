@@ -156,10 +156,10 @@ let rec string_of_stmt context fdecl = function
       eval_expr_to_eax fdecl e3 ^
       loop_begin_label ^ ":\n" ^
       (match e2 with
-          Noexpr -> ""
-        | _ -> eval_expr_to_eax fdecl e2 ^
-               "test eax, eax\n" ^
-               "jz " ^ loop_exit_label ^ "\n") ^
+         Noexpr -> ""
+       | _ -> eval_expr_to_eax fdecl e2 ^
+              "test eax, eax\n" ^
+              "jz " ^ loop_exit_label ^ "\n") ^
       string_of_stmt context' fdecl s ^
       "jmp " ^ loop_label ^ "\n" ^
       loop_exit_label ^ ":\n"
@@ -168,16 +168,31 @@ let rec string_of_stmt context fdecl = function
   | Break -> "jmp " ^ get context.break_label ^ "\n"
   | Continue -> "jmp " ^ get context.continue_label ^ "\n"
   | Try_catch(s1, e, s2) ->
-      let catch_label = get_new_label context
-      and exit_label  = get_new_label context in
-      "push [exception_ptr]\n" ^
-      "mov  [exception_ptr], esp\n" ^
-      "push catch_label\n" ^
+      let catch_label      = get_new_label context
+      and exit_label       = get_new_label context in
+      "lea eax, " ^ catch_label ^ "\n" ^
+      "push esp\n" ^
+      "push ebp\n" ^
+      "push eax\n" ^
+      "push dword ptr [__exception_ptr]\n" ^
+      "mov  [__exception_ptr], esp\n" ^
       string_of_stmt context fdecl s1 ^
       "jmp " ^ exit_label ^ "\n" ^
       catch_label ^ ":\n" ^
+      (match e with
+        Noexpr -> ""
+      | Id(v)  -> sprintf "mov [ebp+%d], eax\n" (id_to_offset fdecl v)
+      | _      -> "ERROR\n") ^
+      eval_expr_to_eax fdecl (Call("__unwind_exception_stack", [Literal(1)])) ^
       string_of_stmt context fdecl s2 ^
       exit_label ^ ":\n"
+
+  | Throw(e) ->
+      eval_expr_to_eax fdecl e ^
+      "mov ecx, [__exception_ptr]\n" ^
+      "mov esp, [ecx+12]\n" ^
+      "mov ebp, [ecx+8]\n" ^
+      "jmp [ecx+4]\n"
 
 let string_of_vdecl id = "int " ^ id ^ ";\n"
 

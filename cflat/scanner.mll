@@ -78,6 +78,7 @@ rule token = parse
 | "continue"		{ CONTINUE }
 | "try"			{ TRY }
 | "catch"		{ CATCH }
+| "throw"               { THROW }
 | integer as lit 	{ LITERAL(int_of_string lit) }
 | identifier as id	{ ID(id) }
 
