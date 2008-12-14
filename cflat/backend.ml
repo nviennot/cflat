@@ -74,12 +74,12 @@ let rec eval_expr_to_eax fdecl = function
       | _ -> "") ^
       eval_expr_to_eax fdecl e ^
       (match o with
-        Not      -> "test eax, eax\n" ^
-                    "mov eax, 0\n" ^
-                    "setz al\n"
-      | Bw_not   -> "not eax\n"
+        Not      -> "test  eax, eax\n" ^
+                    "setz  al\n" ^
+                    "movzx eax, al\n"
+      | Bw_not   -> "not   eax\n"
       | Plus     -> ""
-      | Minus    -> "neg eax\n"
+      | Minus    -> "neg   eax\n"
       | Pre_inc | Post_inc | Pre_dec | Post_dec -> "") ^
       (match (o, e) with
         (Post_inc, Id(s)) -> sprintf "inc dword ptr [ebp+%d]\n" (id_to_offset fdecl s)
@@ -95,9 +95,7 @@ let rec eval_expr_to_eax fdecl = function
       (* eax contains e1, ecx contains e2 *)
 
       (match o with
-        Equal | Neq | Less | Leq | Greater | Geq ->
-         "cmp eax, ecx\n" ^
-         "mov eax, 0\n"
+        Equal | Neq | Less | Leq | Greater | Geq -> "cmp eax, ecx\n"
       | _ -> "" ) ^
 
       (match o with
@@ -110,15 +108,12 @@ let rec eval_expr_to_eax fdecl = function
                    "idiv  ecx\n" ^
                    "mov   eax, edx\n"
       | Or      -> "or    eax, ecx\n" ^
-                   "mov   eax, 0\n" ^
                    "setnz al\n"
       | And     -> "test  eax, eax\n" ^
-                   "mov   eax, 0\n" ^
                    "setnz al\n" ^
                    "test  ecx, ecx\n" ^
-                   "mov   ecx, 0\n" ^
                    "setnz cl\n" ^
-                   "and   eax, ecx\n"
+                   "and   al, cl\n"
       | Bw_or   -> "or    eax, ecx\n"
       | Bw_and  -> "and   eax, ecx\n"
       | Bw_xor  -> "xor   eax, ecx\n"
@@ -129,7 +124,11 @@ let rec eval_expr_to_eax fdecl = function
       | Less    -> "setl  al\n"
       | Leq     -> "setle al\n"
       | Greater -> "setg  al\n"
-      | Geq     -> "setge al\n")
+      | Geq     -> "setge al\n") ^
+
+      (match o with
+        Or | And | Equal | Neq | Less | Leq | Greater | Geq -> "movzx eax, al\n"
+      | _ -> "" )
 
   | Assignop(v, o, e) ->
       let binop = (match o with
