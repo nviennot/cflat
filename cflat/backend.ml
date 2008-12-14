@@ -74,12 +74,12 @@ let rec eval_expr_to_eax fdecl = function
   | Unop(o, e) ->
       eval_expr_to_eax fdecl e ^
       (match o with
-        Not      -> "test  eax, eax\n" ^
-                    "setz  al\n" ^
-                    "movzx eax, al\n"
-      | Bw_not   -> "not   eax\n"
-      | Plus     -> ""
-      | Minus    -> "neg   eax\n")
+          Not      -> "test  eax, eax\n" ^
+                      "setz  al\n" ^
+                      "movzx eax, al\n"
+        | Bw_not   -> "not   eax\n"
+        | Plus     -> ""
+        | Minus    -> "neg   eax\n")
 
   | Incop(o, v) ->
     let asm = function
@@ -88,8 +88,9 @@ let rec eval_expr_to_eax fdecl = function
       | Pre_dec | Post_dec->
           sprintf "dec dword ptr [ebp+%d]\n" (id_to_offset fdecl v) in
     (match o with
-      Pre_inc | Pre_dec   -> asm o ^ eval_expr_to_eax fdecl (Id(v))
-    | Post_inc | Post_dec -> eval_expr_to_eax fdecl (Id(v)) ^ asm o)
+        Pre_inc  | Pre_dec  -> asm o ^ eval_expr_to_eax fdecl (Id(v))
+      | Post_inc | Post_dec -> eval_expr_to_eax fdecl (Id(v)) ^ asm o)
+
   | Binop(e1, o, e2) ->
       eval_expr_to_eax fdecl e1 ^
       "push eax\n" ^
@@ -99,42 +100,42 @@ let rec eval_expr_to_eax fdecl = function
       (* eax contains e1, ecx contains e2 *)
 
       (match o with
-        Equal | Neq | Less | Leq | Greater | Geq ->
-          "cmp eax, ecx\n"
-      | _ -> "" ) ^
+          Equal | Neq | Less | Leq | Greater | Geq ->
+            "cmp eax, ecx\n"
+        | _ -> "") ^
 
       (match o with
-        Add     -> "add   eax, ecx\n"
-      | Sub     -> "sub   eax, ecx\n"
-      | Mult    -> "imul  eax, ecx\n"
-      | Div     -> "cdq\n" ^
-                   "idiv  ecx\n"
-      | Modulo  -> "cdq\n" ^
-                   "idiv  ecx\n" ^
-                   "mov   eax, edx\n"
-      | Or      -> "or    eax, ecx\n" ^
-                   "setnz al\n"
-      | And     -> "test  eax, eax\n" ^
-                   "setnz al\n" ^
-                   "test  ecx, ecx\n" ^
-                   "setnz cl\n" ^
-                   "and   al, cl\n"
-      | Bw_or   -> "or    eax, ecx\n"
-      | Bw_and  -> "and   eax, ecx\n"
-      | Bw_xor  -> "xor   eax, ecx\n"
-      | Lshift  -> "sal   eax, cl\n"
-      | Rshift  -> "sar   eax, cl\n"
-      | Equal   -> "sete  al\n"
-      | Neq     -> "setne al\n"
-      | Less    -> "setl  al\n"
-      | Leq     -> "setle al\n"
-      | Greater -> "setg  al\n"
-      | Geq     -> "setge al\n") ^
+          Add     -> "add   eax, ecx\n"
+        | Sub     -> "sub   eax, ecx\n"
+        | Mult    -> "imul  eax, ecx\n"
+        | Div     -> "cdq\n" ^
+                     "idiv  ecx\n"
+        | Modulo  -> "cdq\n" ^
+                     "idiv  ecx\n" ^
+                     "mov   eax, edx\n"
+        | Or      -> "or    eax, ecx\n" ^
+                     "setnz al\n"
+        | And     -> "test  eax, eax\n" ^
+                     "setnz al\n" ^
+                     "test  ecx, ecx\n" ^
+                     "setnz cl\n" ^
+                     "and   al, cl\n"
+        | Bw_or   -> "or    eax, ecx\n"
+        | Bw_and  -> "and   eax, ecx\n"
+        | Bw_xor  -> "xor   eax, ecx\n"
+        | Lshift  -> "sal   eax, cl\n"
+        | Rshift  -> "sar   eax, cl\n"
+        | Equal   -> "sete  al\n"
+        | Neq     -> "setne al\n"
+        | Less    -> "setl  al\n"
+        | Leq     -> "setle al\n"
+        | Greater -> "setg  al\n"
+        | Geq     -> "setge al\n") ^
 
       (match o with
-        Or | And | Equal | Neq | Less | Leq | Greater | Geq ->
-          "movzx eax, al\n"
-      | _ -> "" )
+          Or | And | Equal | Neq | Less | Leq | Greater | Geq ->
+            "movzx eax, al\n"
+        | _ -> "")
 
   | Assignop(v, o, e) ->
       let binop = (match o with
@@ -207,15 +208,16 @@ let rec string_of_stmt context fdecl = function
       eval_expr_to_eax fdecl e3 ^
       sprintf "%s:\n" loop_begin_label ^
       (match e2 with
-         Noexpr -> ""
-       | _ -> eval_expr_to_eax fdecl e2 ^
-                      "test eax, eax\n" ^
-              sprintf "jz %s\n" loop_exit_label) ^
+          Noexpr -> ""
+        | _ -> eval_expr_to_eax fdecl e2 ^
+               "test eax, eax\n" ^
+               sprintf "jz %s\n" loop_exit_label) ^
       string_of_stmt context' fdecl s ^
       sprintf "jmp %s\n" loop_label ^
       sprintf "%s:\n" loop_exit_label
 
-  | While(e, s) -> string_of_stmt context fdecl (For(Noexpr, e, Noexpr, s))
+  | While(e, s) ->
+      string_of_stmt context fdecl (For(Noexpr, e, Noexpr, s))
 
   | Break ->
       unwind_exception  context.loop_try_level ^
@@ -240,8 +242,8 @@ let rec string_of_stmt context fdecl = function
       sprintf "jmp %s\n" exit_label ^
       sprintf "%s:\n" catch_label ^
       (match s with
-        "" -> ""
-      | _  -> sprintf "mov [ebp+%d], eax\n" (id_to_offset fdecl s)) ^
+          "" -> ""
+        | _  -> sprintf "mov [ebp+%d], eax\n" (id_to_offset fdecl s)) ^
       string_of_stmt context fdecl s2 ^
       sprintf "%s:\n" exit_label
 
