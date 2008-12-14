@@ -47,12 +47,12 @@ an exception looks like this:
 let exception_context_size = 16
 
 let stack_exception catch_label =
-  "lea eax, " ^ catch_label ^ "\n" ^
-  "push esp\n" ^
-  "push ebp\n" ^
-  "push eax\n" ^
-  "push dword ptr [__exception_ptr]\n" ^
-  "mov  [__exception_ptr], esp\n"
+  sprintf "lea eax, %s\n" catch_label ^
+          "push esp\n" ^
+          "push ebp\n" ^
+          "push eax\n" ^
+          "push dword ptr [__exception_ptr]\n" ^
+          "mov  [__exception_ptr], esp\n"
 
 let unstack_exception n =
   sprintf "add esp, %d\n" (exception_context_size * n)
@@ -65,12 +65,18 @@ let rec unwind_exception = function
          unwind_exception (n-1)
 
 let rec eval_expr_to_eax fdecl = function
-    Literal(l) -> sprintf "mov eax, %d\n" l
-  | Id(s) -> sprintf "mov eax, [ebp+%d]\n" (id_to_offset fdecl s)
+    Literal(l) ->
+      sprintf "mov eax, %d\n" l
+
+  | Id(s) ->
+      sprintf "mov eax, [ebp+%d]\n" (id_to_offset fdecl s)
+
   | Unop(o, e) ->
       (match (o, e) with
-        (Pre_inc, Id(s)) -> sprintf "inc dword ptr [ebp+%d]\n" (id_to_offset fdecl s)
-      | (Pre_dec, Id(s)) -> sprintf "dec dword ptr [ebp+%d]\n" (id_to_offset fdecl s)
+        (Pre_inc, Id(s)) ->
+          sprintf "inc dword ptr [ebp+%d]\n" (id_to_offset fdecl s)
+      | (Pre_dec, Id(s)) ->
+          sprintf "dec dword ptr [ebp+%d]\n" (id_to_offset fdecl s)
       | _ -> "") ^
       eval_expr_to_eax fdecl e ^
       (match o with
@@ -82,8 +88,10 @@ let rec eval_expr_to_eax fdecl = function
       | Minus    -> "neg   eax\n"
       | Pre_inc | Post_inc | Pre_dec | Post_dec -> "") ^
       (match (o, e) with
-        (Post_inc, Id(s)) -> sprintf "inc dword ptr [ebp+%d]\n" (id_to_offset fdecl s)
-      | (Post_dec, Id(s)) -> sprintf "dec dword ptr [ebp+%d]\n" (id_to_offset fdecl s)
+        (Post_inc, Id(s)) ->
+          sprintf "inc dword ptr [ebp+%d]\n" (id_to_offset fdecl s)
+      | (Post_dec, Id(s)) ->
+          sprintf "dec dword ptr [ebp+%d]\n" (id_to_offset fdecl s)
       | _ -> "")
 
   | Binop(e1, o, e2) ->
@@ -95,7 +103,8 @@ let rec eval_expr_to_eax fdecl = function
       (* eax contains e1, ecx contains e2 *)
 
       (match o with
-        Equal | Neq | Less | Leq | Greater | Geq -> "cmp eax, ecx\n"
+        Equal | Neq | Less | Leq | Greater | Geq ->
+          "cmp eax, ecx\n"
       | _ -> "" ) ^
 
       (match o with
@@ -127,7 +136,8 @@ let rec eval_expr_to_eax fdecl = function
       | Geq     -> "setge al\n") ^
 
       (match o with
-        Or | And | Equal | Neq | Less | Leq | Greater | Geq -> "movzx eax, al\n"
+        Or | And | Equal | Neq | Less | Leq | Greater | Geq ->
+          "movzx eax, al\n"
       | _ -> "" )
 
   | Assignop(v, o, e) ->
@@ -144,11 +154,13 @@ let rec eval_expr_to_eax fdecl = function
 
   | Call(f, el) ->
       ( String.concat ""
-      (let prepare_arg = fun e -> eval_expr_to_eax fdecl e ^ "push eax\n" in
+      (let prepare_arg = fun e ->
+                            eval_expr_to_eax fdecl e ^
+                            "push eax\n" in
       (List.map prepare_arg el))) ^
       sprintf "push %d\n" (List.length el) ^
-      "call __reverse_args\n" ^
-      "add  esp, 4\n" ^
+              "call __reverse_args\n" ^
+              "add  esp, 4\n" ^
       sprintf "call %s\n" f ^
       sprintf "add  esp, %d\n" (4 * (List.length el))
   | Noexpr -> ""
@@ -163,19 +175,19 @@ let rec string_of_stmt context fdecl = function
       unwind_exception  context.function_try_level ^
       unstack_exception context.function_try_level ^
       eval_expr_to_eax fdecl expr ^
-      "jmp " ^ (get context.return_label) ^ "\n"
+      sprintf "jmp %s\n" (get context.return_label)
 
   | If(e, s1, s2) ->
       let else_label    = get_new_label context
       and exit_if_label = get_new_label context in
-      (eval_expr_to_eax fdecl e) ^ "\n" ^
-      "test eax, eax\n" ^
-      "jz " ^ else_label ^ "\n" ^
-      (string_of_stmt context fdecl s1) ^ "\n" ^
-      "jmp " ^ exit_if_label ^ "\n" ^
-      else_label ^ ":\n" ^
-      (string_of_stmt context fdecl s2) ^ "\n" ^
-      exit_if_label ^ ":\n"
+      eval_expr_to_eax fdecl e ^
+              "test eax, eax\n" ^
+      sprintf "jz %s\n" else_label ^
+      string_of_stmt context fdecl s1 ^
+      sprintf "jmp %s\n" exit_if_label ^
+      sprintf "%s:\n" else_label ^
+      string_of_stmt context fdecl s2 ^
+      sprintf "%s:\n" exit_if_label
 
   | For(e1, e2, e3, s) ->
       let loop_begin_label = get_new_label context
@@ -185,48 +197,49 @@ let rec string_of_stmt context fdecl = function
                                     break_label    = Some loop_exit_label;
                                     loop_try_level = 0 } in
       eval_expr_to_eax fdecl e1 ^
-      "jmp " ^ loop_begin_label ^ "\n" ^
-      loop_label ^ ":\n" ^
+      sprintf "jmp %s\n" loop_begin_label ^
+      sprintf "%s:\n" loop_label ^
       eval_expr_to_eax fdecl e3 ^
-      loop_begin_label ^ ":\n" ^
+      sprintf "%s:\n" loop_begin_label ^
       (match e2 with
          Noexpr -> ""
        | _ -> eval_expr_to_eax fdecl e2 ^
-              "test eax, eax\n" ^
-              "jz " ^ loop_exit_label ^ "\n") ^
+                      "test eax, eax\n" ^
+              sprintf "jz %s\n" loop_exit_label) ^
       string_of_stmt context' fdecl s ^
-      "jmp " ^ loop_label ^ "\n" ^
-      loop_exit_label ^ ":\n"
+      sprintf "jmp %s\n" loop_label ^
+      sprintf "%s:\n" loop_exit_label
 
   | While(e, s) -> string_of_stmt context fdecl (For(Noexpr, e, Noexpr, s))
 
   | Break ->
       unwind_exception  context.loop_try_level ^
       unstack_exception context.loop_try_level ^
-      "jmp " ^ get context.break_label ^ "\n"
+      sprintf "jmp %s\n" (get context.break_label)
 
   | Continue ->
       unwind_exception  context.loop_try_level ^
       unstack_exception context.loop_try_level ^
-      "jmp " ^ get context.continue_label ^ "\n"
+      sprintf "jmp %s\n" (get context.continue_label)
 
   | Try_catch(s1, e, s2) ->
       let catch_label      = get_new_label context
       and exit_label       = get_new_label context in
+      let context' = { context with
+                         function_try_level = context.function_try_level + 1;
+                         loop_try_level     = context.loop_try_level + 1} in
       stack_exception catch_label ^
-      let context' = { context with function_try_level = context.function_try_level + 1;
-                                    loop_try_level     = context.loop_try_level + 1} in
-        string_of_stmt context' fdecl s1 ^
+      string_of_stmt context' fdecl s1 ^
       unwind_exception 1 ^
       unstack_exception 1 ^
-      "jmp " ^ exit_label ^ "\n" ^
-      catch_label ^ ":\n" ^
+      sprintf "jmp %s\n" exit_label ^
+      sprintf "%s:\n" catch_label ^
       (match e with
         Noexpr -> ""
       | Id(v)  -> sprintf "mov [ebp+%d], eax\n" (id_to_offset fdecl v)
       | _      -> "ERROR\n") ^
       string_of_stmt context fdecl s2 ^
-      exit_label ^ ":\n"
+      sprintf "%s:\n" exit_label
 
   | Throw(e) ->
       "push [__exception_ptr]\n" ^
@@ -241,21 +254,21 @@ let string_of_vdecl id = "int " ^ id ^ ";\n"
 
 let string_of_fdecl context fdecl =
   let context' = { context with return_label = Some (get_new_label context) } in
-  ".globl " ^ fdecl.fname ^ "\n" ^
-  ".type   " ^ fdecl.fname ^ ", @function\n" ^
-  fdecl.fname ^ ":\n" ^
-  "push ebp\n" ^
-  "mov  ebp, esp\n" ^
-  "sub  esp, " ^ (string_of_int (4 * (List.length fdecl.locals))) ^ "\n" ^
-  "push ecx\n" ^
-  "push edx\n" ^
+  sprintf ".globl %s\n" fdecl.fname ^
+  sprintf ".type %s, @function\n" fdecl.fname ^
+  sprintf "%s:\n" fdecl.fname ^
+          "push ebp\n" ^
+          "mov  ebp, esp\n" ^
+  sprintf "sub  esp, %d\n" (4 * (List.length fdecl.locals)) ^
+          "push ecx\n" ^
+          "push edx\n" ^
   String.concat "" (List.map (string_of_stmt context' fdecl) fdecl.body) ^
-  get context'.return_label ^ ":\n" ^
-  "pop  edx\n" ^
-  "pop  ecx\n" ^
-  "mov  esp, ebp\n" ^
-  "pop  ebp\n" ^
-  "ret\n"
+  sprintf "%s:\n" (get context'.return_label) ^
+          "pop  edx\n" ^
+          "pop  ecx\n" ^
+          "mov  esp, ebp\n" ^
+          "pop  ebp\n" ^
+          "ret\n"
 
 let generate_asm (vars, funcs) =
   let context = { label_count        = ref 0;
@@ -264,6 +277,7 @@ let generate_asm (vars, funcs) =
                   return_label       = None;
                   function_try_level = 0;
                   loop_try_level     = 0 } in
-  ".intel_syntax\n.text\n.intel_syntax noprefix\n" ^
-  String.concat "\n" (List.map (string_of_fdecl context) funcs) ^
-  ".ident \"C Flat compiler 0.1\"\n.section .note.GNU-stack,\"\",@progbits\n"
+  ".intel_syntax noprefix\n" ^
+  ".text\n" ^
+  String.concat "" (List.map (string_of_fdecl context) funcs) ^
+  ".ident \"C Flat compiler 0.1\"\n"
