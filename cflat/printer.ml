@@ -5,10 +5,12 @@ let rec string_of_expr = function
   | Id(s) -> s
   | Unop(o, e) ->
       (match o with
-        Not -> "!" | Bw_not -> "~" | Plus -> "+" | Minus -> "-"
-      | Pre_inc -> "++" | Pre_dec -> "--" | _ -> "") ^
-      string_of_expr e ^
-      (match o with Post_inc -> "++" | Post_dec -> "--"  | _ -> "")
+        Not -> "!" | Bw_not -> "~" | Plus -> "+" | Minus -> "-") ^
+      string_of_expr e
+  | Incop(o, v) ->
+    (match o with Pre_inc -> "++" | Pre_dec -> "--" | _ -> "") ^
+    v ^
+    (match o with Post_inc -> "++" | Post_dec -> "--"  | _ -> "")
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^
       (match o with
@@ -45,12 +47,12 @@ let rec string_of_stmt = function
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
   | Break -> "break"
   | Continue -> "continue"
-  | Try_catch(s1, Noexpr, s2) ->
+  | Try_catch(s1, "", s2) ->
       "try\n" ^ string_of_stmt s1 ^
       "catch\n" ^ string_of_stmt s2
-  | Try_catch(s1, e, s2) ->
+  | Try_catch(s1, s, s2) ->
       "try\n" ^ string_of_stmt s1 ^
-      "catch (" ^ string_of_expr e ^ ")\n" ^ string_of_stmt s2
+      "catch (" ^ s ^ ")\n" ^ string_of_stmt s2
   | Throw(e) -> "throw " ^ string_of_expr e ^ ";\n"
 
 let string_of_vdecl id = "int " ^ id ^ ";\n"

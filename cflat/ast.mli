@@ -8,12 +8,16 @@ type assignop =
   | Bw_or_assign | Bw_and_assign | Bw_xor_assign | Lshift_assign | Rshift_assign
 
 type unop =
-    Not | Bw_not | Plus | Minus | Pre_inc | Post_inc | Pre_dec | Post_dec
+    Not | Bw_not | Plus | Minus
+
+type incop =
+    Pre_inc | Post_inc | Pre_dec | Post_dec
 
 type expr =
     Literal of int
   | Id of string
   | Unop of unop * expr
+  | Incop of incop * string
   | Binop of expr * binop * expr
   | Assignop of string * assignop * expr
   | Assign of string * expr
@@ -29,7 +33,7 @@ type stmt =
   | While of expr * stmt
   | Break
   | Continue
-  | Try_catch of stmt * expr * stmt
+  | Try_catch of stmt * string * stmt
   | Throw of expr
 
 type func_decl = {

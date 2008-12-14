@@ -1,26 +1,5 @@
 %{ open Ast %}
 
-/*(*
-microc original shit
-
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA
-%token PLUS MINUS TIMES DIVIDE ASSIGN
-%token EQ NEQ LT LEQ GT GEQ
-%token RETURN IF ELSE FOR WHILE INT BREAK CONTINUE
-%token <int> LITERAL
-%token <string> ID
-%token EOF
-
-%nonassoc NOELSE
-%nonassoc ELSE
-
-%left ASSIGN
-%left EQ NEQ
-%left LT GT LEQ GEQ
-%left PLUS MINUS
-%left TIMES DIVIDE
-*)*/
-
 %token INC DEC MINUS_ASSIGN PLUS_ASSIGN TIMES_ASSIGN DIVIDE_ASSIGN MODULO_ASSIGN
 %token MINUS PLUS TIMES DIVIDE MODULO
 %token LSHIFT_ASSIGN RSHIFT_ASSIGN BW_AND_ASSIGN BW_OR_ASSIGN BW_XOR_ASSIGN
@@ -36,48 +15,24 @@ microc original shit
 %nonassoc ELSE
 
 %left BW_AND_ASSIGN BW_XOR_ASSIGN BW_OR_ASSIGN
-%left LEFT_SHIFT_ASSIGN RIGHT_SHIFT_ASSIGN
+%left LSHIFT_ASSIGN RSHIFT_ASSIGN
 %left TIMES_ASSIGN DIVIDE_ASSIGN MODULO_ASSIGN
 %left PLUS_ASSIGN MINUS_ASSIGN
 %left ASSIGN
 %left OR
 %left AND
-%left BW_AND BW_XOR BW_OR
+%left BW_OR
+%left BW_XOR
+%left BW_AND
 %left EQ NEQ
 %left GT GEQ
 %left LT LEQ
 %left LSHIFT RSHIFT
-%left PLUS MINUS /*(* is it ok ?? unary/binary *)*/
+%left PLUS MINUS
 %left TIMES DIVIDE MODULO
-%right NOT BW_NOT
-%left INC DEC
-
-/*(*
-wanted precedence
-%left SEMI
-%left COMMA
-%left LBRACE RBRACE
-%left BW_AND_ASSIGN BW_XOR_ASSIGN BW_OR_ASSIGN
-%left LEFT_SHIFT_ASSIGN RIGHT_SHIFT_ASSIGN
-%left TIMES_ASSIGN DIVIDE_ASSIGN MODULO_ASSIGN
-%left PLUS_ASSIGN MINUS_ASSIGN
-%left ASSIGN
-%left OR
-%left AND
-%left BW_AND BW_XOR BW_OR
-%left EQ NEQ
-%left GT GEQ
-%left LT LEQ
-%left LSHIFT RSHIFT
-(*%left PLUS MINUS (* is it ok ?? unary/binary *)*)
-%left TIMES DIVIDE MODULO
-%right NOT BW_NOT
-%left LPAREN RPAREN
-%left PLUS MINUS (* is it ok ?? unary/binary *)
-%left INC DEC
-%left FOR WHILE IF ELSE GOTO RETURN
-*)*/
-
+%nonassoc NOT BW_NOT
+%nonassoc U_PLUS U_MINUS
+%nonassoc INC DEC
 
 %start program
 %type <Ast.program> program
@@ -125,8 +80,10 @@ stmt:
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
   | BREAK SEMI { Break }
   | CONTINUE SEMI { Continue }
-  | TRY stmt CATCH LPAREN expr RPAREN stmt { Try_catch($2, $5, $7) }
-  | TRY stmt CATCH stmt { Try_catch($2, Noexpr, $4) }
+  | TRY LBRACE stmt_list RBRACE CATCH LBRACE stmt_list RBRACE
+    { Try_catch(Block(List.rev $3), "", Block(List.rev $7)) }
+  | TRY LBRACE stmt_list RBRACE CATCH LPAREN ID RPAREN LBRACE stmt_list RBRACE
+    { Try_catch(Block(List.rev $3), $7, Block(List.rev $10)) }
   | THROW expr SEMI { Throw($2) }
 
 expr_opt:
@@ -158,12 +115,12 @@ expr:
 
   | NOT    expr { Unop(Not,      $2) }
   | BW_NOT expr { Unop(Bw_not,   $2) }
-  | PLUS   expr { Unop(Plus,     $2) }
-  | MINUS  expr { Unop(Minus,    $2) }
-  | INC    expr { Unop(Pre_inc,  $2) }
-  | DEC    expr { Unop(Pre_dec,  $2) }
-  | expr   INC  { Unop(Post_inc, $1) }
-  | expr   DEC  { Unop(Post_dec, $1) }
+  | PLUS   expr %prec U_PLUS   { Unop(Plus,     $2) }
+  | MINUS  expr %prec U_MINUS  { Unop(Minus,    $2) }
+  | INC    ID   { Incop(Pre_inc,  $2) }
+  | DEC    ID   { Incop(Pre_dec,  $2) }
+  | ID     INC  { Incop(Post_inc, $1) }
+  | ID     DEC  { Incop(Post_dec, $1) }
  
   | ID BW_AND_ASSIGN expr { Assignop($1, Bw_and_assign, $3) }
   | ID BW_OR_ASSIGN  expr { Assignop($1, Bw_or_assign,  $3) }
