@@ -149,16 +149,25 @@ let rec eval_expr_to_eax fdecl = function
       sprintf "mov [ebp+%d], eax\n" (id_to_offset fdecl v)
 
   | Call(f, el) ->
-      ( String.concat ""
-      (let prepare_arg = fun e ->
-                            eval_expr_to_eax fdecl e ^
-                            "push eax\n" in
-      (List.map prepare_arg el))) ^
-      sprintf "push %d\n" (List.length el) ^
-              "call __reverse_args\n" ^
-              "add  esp, 4\n" ^
+      let push_func_args =
+        let prepare_arg e =
+          eval_expr_to_eax fdecl e ^
+          "push eax\n" in
+        String.concat "" (List.map prepare_arg el) ^
+        let swap_two_args i j =
+          sprintf "mov  eax, [esp+%d]\n" (4 * i) ^
+          sprintf "xchg eax, [esp+%d]\n" (4 * j) ^
+          sprintf "mov  [esp+%d], eax\n" (4 * i) in
+        let rec reverse_all_args i j =
+            if i < j then
+              swap_two_args i j ^
+              reverse_all_args (i+1) (j-1)
+            else "" in
+        reverse_all_args 0 (List.length el - 1) in
+      push_func_args ^
       sprintf "call %s\n" f ^
       sprintf "add  esp, %d\n" (4 * (List.length el))
+
   | Noexpr -> ""
 
 let rec string_of_stmt context fdecl = function

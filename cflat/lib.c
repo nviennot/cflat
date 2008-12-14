@@ -12,13 +12,4 @@ asmlinkage void out(int val) {
   printf("%d\n", val);
 }
 
-asmlinkage void __reverse_args(int n) {
-  int i;
-  for (i = 0; i < n/2; i++) {
-    int tmp = (&n+1)[i];
-    (&n+1)[i] = (&n+1)[n-i-1];
-    (&n+1)[n-i-1] = tmp;
-  }
-}
-
 void *__exception_ptr;
