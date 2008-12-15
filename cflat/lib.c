@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #define asmlinkage __attribute__((regparm(0)))
 

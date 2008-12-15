@@ -6,7 +6,7 @@
 %token LSHIFT RSHIFT BW_NOT BW_AND BW_OR BW_XOR
 %token LEQ GEQ NEQ EQ NOT AND OR LT GT
 %token ASSIGN LPAREN RPAREN LBRACE RBRACE SEMI COMMA
-%token FOR WHILE IF ELSE GOTO RETURN INT BREAK CONTINUE TRY CATCH THROW
+%token FOR WHILE IF ELSE GOTO RETURN BREAK CONTINUE TRY CATCH THROW
 %token <int> LITERAL
 %token <string> ID
 %token EOF
@@ -38,15 +38,14 @@
 %%
 
 program:
-   /* nothing */ { [], [] }
- | program fdecl { fst $1, ($2 :: snd $1) }
+   /* nothing */ { [] }
+ | program fdecl { $2 :: $1 }
 
 fdecl:
-   ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
-     { { fname = $1;
-	 formals = $3;
-	 locals = List.rev $6;
-	 body = List.rev $7 } }
+   ID LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
+     { { _fname = $1;
+	 _formals = $3;
+	 _body = List.rev $6 } }
 
 formals_opt:
     /* nothing */ { [] }
@@ -55,13 +54,6 @@ formals_opt:
 formal_list:
     ID                   { [$1] }
   | formal_list COMMA ID { $3 :: $1 }
-
-vdecl_list:
-    /* nothing */    { [] }
-  | vdecl_list vdecl { $2 :: $1 }
-
-vdecl:
-   INT ID SEMI { $2 }
 
 stmt_list:
     /* nothing */  { [] }

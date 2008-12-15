@@ -45,9 +45,6 @@ f(a, b) {
   out(b);
 }
 main() {
-  int a;
-  int b;
-
   a = 1;
   b = a;
   out(b);
@@ -73,7 +70,6 @@ main() {
 ...
 main() {
   /* increment and decrement */
-  int a;
   a = 0;
   out(a++);
   out(a);
@@ -126,7 +122,6 @@ main() {
 ...
 main() {
   /* Assign binops */
-  int a;
   a = 0; a += 2; out(a);
   a = 0; a -= 2; out(a);
   a = 2; a *= 3; out(a);
@@ -188,10 +183,6 @@ op(expr, wanted, not_wanted) {
   out((expr == wanted) && (wanted != not_wanted));
 }
 main() {
-  int a;
-  int b;
-  int c;
-
    /* left assoc test */
   out(2) * out(3) * out(4);
 
@@ -245,8 +236,6 @@ main() {
    *** Nested for/while ***
 ...
 main() {
-	int i;
-	int j;
 	for (i = 0; i < 2; i = i + 1) {
 		while (0) {
 		}
@@ -270,8 +259,6 @@ main() {
 
 ...
 main() {
-	int a;
-	int b;
 	a = 2;
 	b = 3;
 	out (a+b);
@@ -280,9 +267,6 @@ main() {
 
 ...
 main() {
-	int i;
-	int sum;
-
 	sum = 0;
 	for (i = 0; i <= 10; i=i+1)
 		sum = sum + i;
@@ -295,7 +279,6 @@ func(a) {
 	a-1;
 }
 main() {
-	int a;
 	a = 10;
 	while(func(a))
 		a = func(a);
@@ -325,7 +308,6 @@ main () {
 
 ...
 main () {
-	int i;
 	for (i = 0; i < 10; i = i + 1) {
 		break;
 		out(3);
@@ -336,7 +318,6 @@ main () {
 
 ...
 main () {
-	int i;
 	for (i = 0; i < 10; i = i + 1) {
 		if (i > 2) {
 			break;
@@ -349,7 +330,6 @@ main () {
 
 ...
 main () {
-	int i;
 	for (i = 0; i < 4; i = i + 1) {
 		if (i == 1) {
 			continue;
@@ -368,7 +348,6 @@ g() {
   throw 4;
 }
 f() {
-  int b;
   try {
     g();
   } catch (b) {
@@ -377,7 +356,6 @@ f() {
   }
 }
 main() {
-  int a;
   out(1);
   try {
     f();
@@ -392,7 +370,6 @@ main() {
 ...
 /* continue/break in a loop */
 main() {
-  int i;
   for (i=0; i < 5; i++) {
     try {
       try {
@@ -420,7 +397,6 @@ f() {
 }
 
 main() {
-  int a;
   try {
     f();
     throw 1;

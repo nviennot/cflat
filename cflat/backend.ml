@@ -1,7 +1,7 @@
 open Ast
 open Printf
 
-type context_t = {
+type context = {
   label_count        : int ref;
   break_label        : string option;
   continue_label     : string option;
@@ -274,7 +274,7 @@ let string_of_fdecl context fdecl =
   sprintf "sub  esp, %d\n" (4 * (List.length fdecl.locals)) ^
           "push ecx\n" ^
           "push edx\n" ^
-  String.concat "" (List.map (string_of_stmt context' fdecl) fdecl.body) ^
+  string_of_stmt context' fdecl (Block(fdecl.body)) ^
   sprintf "%s:\n" (get context'.return_label) ^
           "pop  edx\n" ^
           "pop  ecx\n" ^
@@ -282,7 +282,7 @@ let string_of_fdecl context fdecl =
           "pop  ebp\n" ^
           "ret\n"
 
-let generate_asm (vars, funcs) =
+let generate_asm funcs =
   let context = { label_count        = ref 0;
                   continue_label     = None;
                   break_label        = None;

@@ -73,7 +73,6 @@ rule token = parse
 | "else"		{ ELSE }
 | "goto"		{ GOTO }
 | "return"		{ RETURN }
-| "int"			{ INT }
 | "break"		{ BREAK }
 | "continue"		{ CONTINUE }
 | "try"			{ TRY }

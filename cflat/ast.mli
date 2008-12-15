@@ -37,10 +37,18 @@ type stmt =
   | Throw of expr
 
 type func_decl = {
-    fname : string;
-    formals : string list;
-    locals : string list;
-    body : stmt list;
-  }
+  _fname : string;
+  _formals : string list;
+  _body : stmt list;
+}
 
-type program = string list * func_decl list
+type program = func_decl list
+
+type func_decl_detail = {
+  fname : string;
+  formals : string list;
+  locals : string list;
+  body : stmt list;
+}
+
+type program_detail = func_decl_detail list
