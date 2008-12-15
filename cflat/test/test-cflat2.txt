@@ -53,6 +53,15 @@ main() {
 }
 ... 0 1 2 3
 
+...
+f(f) {
+  out(f);
+}
+main() {
+  f = 2;
+  f(f);
+}
+... 2
 
    *** Operators correctness ***
 ...
