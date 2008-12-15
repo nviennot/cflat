@@ -269,9 +269,13 @@ let string_of_fdecl context fdecl =
   sprintf ".globl %s\n" fdecl.fname ^
   sprintf ".type %s, @function\n" fdecl.fname ^
   sprintf "%s:\n" fdecl.fname ^
+          (* creating frame *)
           "push ebp\n" ^
           "mov  ebp, esp\n" ^
-  sprintf "sub  esp, %d\n" (4 * (List.length fdecl.locals)) ^
+          (* instead of "sub esp, 4*num_locals", we "push 0" num_locals times,
+             this way, the local variables are cleared on the fly *)
+          "xor  eax, eax\n" ^
+  String.concat "" (List.map (fun _ -> "push eax\n") fdecl.locals) ^
           "push ecx\n" ^
           "push edx\n" ^
   string_of_stmt context' fdecl (Block(fdecl.body)) ^
