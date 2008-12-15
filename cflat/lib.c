@@ -12,4 +12,9 @@ asmlinkage void out(int val) {
   printf("%d\n", val);
 }
 
+asmlinkage void __uncaught_exception(int ex) {
+  printf("uncaught exception: %d\n", ex);
+  exit(1);
+}
+
 void *__exception_ptr;

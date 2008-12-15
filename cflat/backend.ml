@@ -229,7 +229,7 @@ let rec string_of_stmt context fdecl = function
       unstack_exception context.loop_try_level ^
       sprintf "jmp %s\n" (get context.continue_label)
 
-  | Try_catch(s1, s, s2) ->
+  | Try_catch(s1, v, s2) ->
       let catch_label      = get_new_label context
       and exit_label       = get_new_label context in
       let context' = { context with
@@ -241,20 +241,26 @@ let rec string_of_stmt context fdecl = function
       unstack_exception 1 ^
       sprintf "jmp %s\n" exit_label ^
       sprintf "%s:\n" catch_label ^
-      (match s with
+      (match v with
           "" -> ""
-        | _  -> sprintf "mov [ebp+%d], eax\n" (id_to_offset fdecl s)) ^
+        | _  -> sprintf "mov [ebp+%d], edx\n" (id_to_offset fdecl v)) ^
       string_of_stmt context fdecl s2 ^
       sprintf "%s:\n" exit_label
 
   | Throw(e) ->
-      "push [__exception_ptr]\n" ^
-      unwind_exception 1 ^
+      let caught_exception = get_new_label context in
       eval_expr_to_eax fdecl e ^
-      "pop  ecx\n" ^
-      "mov  esp, [ecx+12]\n" ^ (* exception is unstacked *)
-      "mov  ebp, [ecx+8]\n" ^
-      "jmp  [ecx+4]\n"
+              "mov  edx, eax\n" ^
+              "mov  ecx, [__exception_ptr]\n" ^
+              "test ecx, ecx\n" ^
+      sprintf "jnz %s\n" caught_exception ^
+              "push edx\n" ^
+              "call __uncaught_exception\n" ^
+      sprintf "%s:\n" caught_exception ^
+      unwind_exception 1 ^
+              "mov  esp, [ecx+12]\n" ^ (* exception is unstacked *)
+              "mov  ebp, [ecx+8]\n" ^
+              "jmp  [ecx+4]\n"
 
 let string_of_vdecl id = "int " ^ id ^ ";\n"
 

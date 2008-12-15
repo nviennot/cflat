@@ -430,3 +430,9 @@ main() {
   out(2);
 }
 ... 1 2
+
+...
+main() {
+  throw 1;
+}
+... uncaught exception: 1

@@ -50,9 +50,9 @@ let rec string_of_stmt = function
   | Try_catch(s1, "", s2) ->
       "try\n" ^ string_of_stmt s1 ^
       "catch\n" ^ string_of_stmt s2
-  | Try_catch(s1, s, s2) ->
+  | Try_catch(s1, v, s2) ->
       "try\n" ^ string_of_stmt s1 ^
-      "catch (" ^ s ^ ")\n" ^ string_of_stmt s2
+      "catch (" ^ v ^ ")\n" ^ string_of_stmt s2
   | Throw(e) -> "throw " ^ string_of_expr e ^ ";\n"
 
 let string_of_vdecl id = "int " ^ id ^ ";\n"
