@@ -32,6 +32,7 @@ let id_to_offset fdecl id =
     if n >= 0 then
       -4 * (n+1)
     else
+      (* should never happen *)
       raise (Failure ("undefined identifier " ^ id))
 
 (*

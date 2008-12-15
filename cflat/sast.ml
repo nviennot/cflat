@@ -55,11 +55,11 @@ let rec check_stmt fdecl context = function
   | While(e, s) ->  check_stmt fdecl context (For(Noexpr, e, Noexpr, s))
   | Break ->
       if not context.in_loop then
-        raise (Failure ("break keyword used not in a loop"))
+        raise (Failure ("break keyword used outside a loop"))
       else []
   | Continue ->
       if not context.in_loop then
-        raise (Failure ("continue keyword used not in a loop"))
+        raise (Failure ("continue keyword used outside a loop"))
         else []
   | Try_catch(s1, _, s2) ->
      merge_unique (check_stmt fdecl context s1) (check_stmt fdecl context s2)
