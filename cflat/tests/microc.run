@@ -1,3 +1,0 @@
-#!/bin/sh
-./microc > temp.s && gcc -m32 -c temp.s -o temp.o && gcc -m32 temp.o lib.o -o temp.exe && ./temp.exe
-true
