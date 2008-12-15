@@ -20,7 +20,6 @@ parser.ml parser.mli : parser.mly
 %.cmi : %.mli
 	ocamlc -c $<
 
-.PHONY : clean
 clean :
 	rm -f microc parser.ml parser.mli scanner.ml testall.log *.cmo *.cmi *.o *.s test
 
