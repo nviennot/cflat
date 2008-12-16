@@ -61,6 +61,7 @@ stmt_list:
 
 stmt:
     expr SEMI { Expr($1) }
+  | SEMI { Expr(Noexpr) }
   | RETURN expr SEMI { Return($2) }
   | LBRACE stmt_list RBRACE { Block(List.rev $2) }
   | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }

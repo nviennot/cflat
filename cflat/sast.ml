@@ -6,7 +6,7 @@ type context = {
   variables : string list ref;
 }
 
-(* return l1 - l2 *)
+(* returns l1 - l2 *)
 let rec diff_list l1 = function
     [] -> l1
   | hd2 :: tl2 ->
@@ -20,10 +20,10 @@ let rec diff_list l1 = function
 (* add v to the context.variables list if not in the list *)
 let add_variable context v =
   let rec add_unique_v = function
-          [] -> [v]
-        | hd :: tl ->
-            if hd = v then hd :: tl
-            else hd :: add_unique_v tl in
+      [] -> [v]
+    | hd :: tl ->
+        if hd = v then hd :: tl
+        else hd :: add_unique_v tl in
   context.variables := add_unique_v !(context.variables)
 
 let rec check_expr fdecl context = function
@@ -55,9 +55,9 @@ let rec check_stmt fdecl context = function
                             check_stmt fdecl context' s
   | While(e, s)          -> check_stmt fdecl context (For(Noexpr, e, Noexpr, s))
   | Break                -> if not context.in_loop then
-                              raise (Failure ("break keyword used outside a loop"))
+                              raise (Failure("break keyword used outside a loop"))
   | Continue             -> if not context.in_loop then
-                              raise (Failure ("continue keyword used outside a loop"))
+                              raise (Failure("continue keyword used outside a loop"))
   | Try_catch(s1, v, s2) -> check_stmt fdecl context s1;
                             add_variable context v;
                             check_stmt fdecl context s2
@@ -65,6 +65,18 @@ let rec check_stmt fdecl context = function
 
 (* check a func_decl and returns a func_decl_detail *)
 let check_func fdecl =
+  (* first check that each formal is only declared once *)
+  let rec check_formal_unique formal_list formal =
+    (match formal_list with
+          [] -> [formal]
+        | hd :: tl ->
+            if hd = formal then
+               raise (Failure("formal " ^ formal ^ " is declared more than once" ^
+                              " in function " ^ fdecl._fname))
+            else
+               hd :: check_formal_unique tl formal) in
+  let _ = List.fold_left check_formal_unique [] fdecl._formals in
+
   let context = { in_loop = false; variables = ref [] } in
   check_stmt fdecl context (Block(fdecl._body));
   { fname = fdecl._fname;
@@ -74,4 +86,16 @@ let check_func fdecl =
 
 (* check a program and returns a program_detail *)
 let check_program funcs =
+   (* first we check that a function is only declared once *)
+    let rec check_funcs_unique fname_list fdecl =
+      (match fname_list with
+          [] -> [fdecl._fname]
+        | hd :: tl ->
+            if hd = fdecl._fname then
+               raise (Failure("function " ^ fdecl._fname ^
+                      " is declared more than once"))
+            else
+               hd :: check_funcs_unique tl fdecl) in
+  let _ = List.fold_left check_funcs_unique [] funcs in
+
   List.map check_func funcs

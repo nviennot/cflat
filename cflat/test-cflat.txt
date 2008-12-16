@@ -65,6 +65,29 @@ main() {
 }
 ... 2
 
+...
+/* local variable discovery */
+dummy(a) { }
+a() { v; }
+b() { !v; }
+c() { v++; }
+d() { v+0; }
+e() { 0+v; }
+f() { v+=0; }
+g() { v=0; }
+h() { dummy(v); }
+i() { { v; } }
+j() { return v; }
+k() { if (v); }
+l() { for(v;;); }
+m() { for(;v;); }
+n() { for(;;v); }
+o() { while (v); }
+p() { try {} catch(v) {} }
+q() { throw v; }
+main() { }
+... OK
+
 
    *** Operators correctness ***
 ...
@@ -221,6 +244,25 @@ main() {
 
    *** Function test ***
 ...
+/* should compile, number of argument are not checked */
+f(a,b,c) { }
+main() { f(a); }
+... OK
+
+...
+/* duplicate function */
+f() {}
+f() {}
+main() {}
+... BAD
+
+...
+/* duplicate formals */
+f(a,b,a) {}
+main() {}
+... BAD
+
+...
 /* Function call evaluation order */
 f(a, b, c) { out(a); out(b); out(c); }
 g(a, b, c) { }
@@ -289,6 +331,7 @@ main() {
 ...
 /* empty condition */
 main() {
+  for (;;) break;
   for (;;i++) {
     if (i == 3)
       break;
