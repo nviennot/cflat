@@ -5,6 +5,7 @@ CFLAGS="-m32"
 microc : $(OBJS) lib.o
 	ocamlc -o microc $(OBJS)
 
+.PHONY: test
 test : microc tester.py test-cflat.txt
 	./tester.py test-cflat.txt
 
@@ -20,6 +21,7 @@ parser.ml parser.mli : parser.mly
 %.cmi : %.mli
 	ocamlc -c $<
 
+.PHONY : clean
 clean :
 	rm -f microc parser.ml parser.mli scanner.ml testall.log *.cmo *.cmi *.o *.s test
 
