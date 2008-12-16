@@ -48,10 +48,9 @@ an exception looks like this:
 let exception_context_size = 16
 
 let stack_exception catch_label =
-  sprintf "lea eax, %s\n" catch_label ^
           "push esp\n" ^
           "push ebp\n" ^
-          "push eax\n" ^
+  sprintf "push offset %s\n" catch_label ^
           "push dword ptr [__exception_ptr]\n" ^
           "mov  [__exception_ptr], esp\n"
 

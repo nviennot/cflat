@@ -464,4 +464,3 @@ main() {
   throw 1;
 }
 ... uncaught exception: 1
-
