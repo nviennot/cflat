@@ -58,7 +58,8 @@ let rec check_stmt fdecl context = function
                               raise (Failure ("break keyword used outside a loop"))
   | Continue             -> if not context.in_loop then
                               raise (Failure ("continue keyword used outside a loop"))
-  | Try_catch(s1, _, s2) -> check_stmt fdecl context s1;
+  | Try_catch(s1, v, s2) -> check_stmt fdecl context s1;
+                            add_variable context v;
                             check_stmt fdecl context s2
   | Throw(e)             -> check_expr fdecl context e
 
