@@ -55,7 +55,7 @@ let stack_exception catch_label =
           "mov  [__exception_ptr], esp\n"
 
 let unstack_exception n =
-  sprintf "add esp, %d\n" (exception_context_size * n)
+  sprintf "add  esp, %d\n" (exception_context_size * n)
 
 let rec unwind_exception = function
     0 -> ""
@@ -95,7 +95,7 @@ let rec eval_expr_to_eax fdecl = function
       eval_expr_to_eax fdecl e1 ^
       "push eax\n" ^
       eval_expr_to_eax fdecl e2 ^
-      "pop ecx\n" ^
+      "pop  ecx\n" ^
       "xchg eax, ecx\n" ^
       (* eax contains e1, ecx contains e2 *)
 
@@ -188,9 +188,9 @@ let rec string_of_stmt context fdecl = function
       and exit_if_label = get_new_label context in
       eval_expr_to_eax fdecl e ^
               "test eax, eax\n" ^
-      sprintf "jz %s\n" else_label ^
+      sprintf "jz   %s\n" else_label ^
       string_of_stmt context fdecl s1 ^
-      sprintf "jmp %s\n" exit_if_label ^
+      sprintf "jmp  %s\n" exit_if_label ^
       sprintf "%s:\n" else_label ^
       string_of_stmt context fdecl s2 ^
       sprintf "%s:\n" exit_if_label
@@ -210,8 +210,8 @@ let rec string_of_stmt context fdecl = function
       (match e2 with
           Noexpr -> ""
         | _ -> eval_expr_to_eax fdecl e2 ^
-               "test eax, eax\n" ^
-               sprintf "jz %s\n" loop_exit_label) ^
+                       "test eax, eax\n" ^
+               sprintf "jz   %s\n" loop_exit_label) ^
       string_of_stmt context' fdecl s ^
       sprintf "jmp %s\n" loop_label ^
       sprintf "%s:\n" loop_exit_label
@@ -253,7 +253,7 @@ let rec string_of_stmt context fdecl = function
               "mov  edx, eax\n" ^
               "mov  ecx, [__exception_ptr]\n" ^
               "test ecx, ecx\n" ^
-      sprintf "jnz %s\n" caught_exception ^
+      sprintf "jnz  %s\n" caught_exception ^
               "push edx\n" ^
               "call __uncaught_exception\n" ^
       sprintf "%s:\n" caught_exception ^
