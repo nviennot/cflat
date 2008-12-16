@@ -44,9 +44,9 @@ let rec check_stmt fdecl context = function
   | Expr(e) -> check_expr fdecl e
   | Return(e) -> check_expr fdecl e
   | If(e, s1, s2) ->
-      merge_unique
-        (merge_unique (check_expr fdecl e) (check_stmt fdecl context s1))
-        (check_stmt fdecl context s2)
+      List.fold_left merge_unique []
+        [check_expr fdecl e; check_stmt fdecl context s1;
+        check_stmt fdecl context s2]
   | For(e1, e2, e3, s) ->
       let context' = { in_loop = true } in
       List.fold_left merge_unique []
@@ -60,7 +60,7 @@ let rec check_stmt fdecl context = function
   | Continue ->
       if not context.in_loop then
         raise (Failure ("continue keyword used outside a loop"))
-        else []
+      else []
   | Try_catch(s1, _, s2) ->
      merge_unique (check_stmt fdecl context s1) (check_stmt fdecl context s2)
   | Throw(e) -> check_expr fdecl e
