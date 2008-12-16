@@ -6,6 +6,7 @@ type context = {
   variables : string list ref;
 }
 
+(* return l1 - l2 *)
 let rec diff_list l1 = function
     [] -> l1
   | hd2 :: tl2 ->
@@ -64,10 +65,11 @@ let rec check_stmt fdecl context = function
 (* check a func_decl and returns a func_decl_detail *)
 let check_func fdecl =
   let context = { in_loop = false; variables = ref [] } in
-  let _ = check_stmt fdecl context (Block(fdecl._body)) in
-  { fname = fdecl._fname; formals = fdecl._formals;
+  check_stmt fdecl context (Block(fdecl._body));
+  { fname = fdecl._fname;
+    formals = fdecl._formals;
     locals = diff_list !(context.variables) fdecl._formals;
-    body = fdecl._body}
+    body = fdecl._body }
 
 (* check a program and returns a program_detail *)
 let check_program funcs =
