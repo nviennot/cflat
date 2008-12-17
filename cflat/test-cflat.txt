@@ -1,7 +1,7 @@
 # The first line that doesn't start with a '#' should be the compiler command.
 # It should read source code from stdin and produce an executable named
 # 'test'.
-bash -c '(./microc > test.s && gcc -m32 -c test.s -o test.o && gcc -m32 test.o lib.o -o test)'
+bash -c '(./cflat > test.s && gcc -m32 -c test.s -o test.o && gcc -m32 test.o lib.o -o test)'
 
 After the compiler command, anything not within a test case (surrounded by ...)
 is ignored.
