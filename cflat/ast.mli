@@ -4,7 +4,7 @@ type binop =
   | Equal | Neq | Less | Leq | Greater | Geq
 
 type assignop =
-    Add_assign | Sub_assign | Mult_assign | Div_assign | Modulo_assign
+    Assign | Add_assign | Sub_assign | Mult_assign | Div_assign | Modulo_assign
   | Bw_or_assign | Bw_and_assign | Bw_xor_assign | Lshift_assign | Rshift_assign
 
 type unop =
@@ -20,7 +20,6 @@ type expr =
   | Incop of incop * string
   | Binop of expr * binop * expr
   | Assignop of string * assignop * expr
-  | Assign of string * expr
   | Call of string * expr list
   | Noexpr
 

@@ -14,11 +14,8 @@
 %nonassoc NOELSE
 %nonassoc ELSE
 
-%right BW_AND_ASSIGN BW_XOR_ASSIGN BW_OR_ASSIGN
-%right LSHIFT_ASSIGN RSHIFT_ASSIGN
-%right TIMES_ASSIGN DIVIDE_ASSIGN MODULO_ASSIGN
-%right PLUS_ASSIGN MINUS_ASSIGN
-%right ASSIGN
+%right BW_AND_ASSIGN BW_XOR_ASSIGN BW_OR_ASSIGN LSHIFT_ASSIGN RSHIFT_ASSIGN
+       TIMES_ASSIGN DIVIDE_ASSIGN MODULO_ASSIGN PLUS_ASSIGN MINUS_ASSIGN ASSIGN
 %left OR
 %left AND
 %left BW_OR
@@ -122,7 +119,7 @@ expr:
   | ID MODULO_ASSIGN expr { Assignop($1, Modulo_assign, $3) }
   | ID PLUS_ASSIGN   expr { Assignop($1, Add_assign,    $3) }
   | ID MINUS_ASSIGN  expr { Assignop($1, Sub_assign,    $3) }
-  | ID ASSIGN expr        { Assign($1, $3) }
+  | ID ASSIGN expr        { Assignop($1, Assign,        $3) }
 
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }

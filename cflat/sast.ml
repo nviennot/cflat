@@ -35,8 +35,6 @@ let rec check_expr fdecl context = function
                             check_expr fdecl context e2
   | Assignop(v, _, e)    -> add_variable context v;
                             check_expr fdecl context e
-  | Assign (v, e)        -> add_variable context v;
-                            check_expr fdecl context e
   | Call(_, el)          -> List.iter (check_expr fdecl context) el
   | Noexpr               -> ()
 
