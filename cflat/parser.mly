@@ -25,8 +25,7 @@
 %left BW_XOR
 %left BW_AND
 %left EQ NEQ
-%left GT GEQ
-%left LT LEQ
+%left GT GEQ LT LEQ
 %left LSHIFT RSHIFT
 %left PLUS MINUS
 %left TIMES DIVIDE MODULO
