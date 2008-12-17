@@ -307,11 +307,15 @@ main() {
   else        out(7);
 
   if (1)
-    if (0)    out(8);
-    else      out(9);
-  else      out(10);
+    if (0)      out(8);
+    else        out(9);
+  else        out(10);
+
+  if (1)    out(11);
+  if (0)    out(12);
+  else      out(13);
 }
-... 1 4 6 9
+... 1 4 6 9 11 13
 
 
    *** Simple loop test ***
