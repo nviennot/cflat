@@ -71,7 +71,6 @@ rule token = parse
 | "while"		{ WHILE }
 | "if"			{ IF }
 | "else"		{ ELSE }
-| "goto"		{ GOTO }
 | "return"		{ RETURN }
 | "break"		{ BREAK }
 | "continue"		{ CONTINUE }
