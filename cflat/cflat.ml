@@ -5,5 +5,5 @@ let _ =
     let program_detail = Sast.check_program program in
       print_string (Backend.generate_asm program_detail); exit 0
   with
-    Failure(s)          -> print_endline ("Error: " ^ s); exit 1
-  | Parsing.Parse_error -> print_endline ("Syntax error"); exit 1
+    Failure(s)          -> prerr_endline ("Error: " ^ s); exit 1
+  | Parsing.Parse_error -> prerr_endline ("Syntax error"); exit 1
