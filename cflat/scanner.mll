@@ -88,6 +88,7 @@ and comment_slash_star level = parse
   "*/" { if level = 0 then token lexbuf
          else comment_slash_star (level-1) lexbuf }
 | "/*" { comment_slash_star (level+1) lexbuf }
+| eof  { raise (Failure("Comment not closed")) }
 | _    { comment_slash_star level lexbuf }
 
 and comment_double_slash = parse

@@ -28,6 +28,11 @@ main() {
 
    *** Comments ***
 ...
+main() { }
+/*
+... BAD
+
+...
 main() {
   out(1);
   /* out(2); /* out(3); */ // */
@@ -36,7 +41,6 @@ main() {
   out(6);
 }
 ... 1 4 6
-
 
    *** Variables ***
 ...
