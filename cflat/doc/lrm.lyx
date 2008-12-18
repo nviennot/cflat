@@ -1470,6 +1470,10 @@ different namespace for variables and function
 can call whatever function with any number of arguments
 \end_layout
 
+\begin_layout Standard
+function returning without a return ...;
+\end_layout
+
 \begin_layout Section
 Syntax Summary
 \end_layout
