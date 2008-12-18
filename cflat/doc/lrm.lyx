@@ -1,4 +1,4 @@
-#LyX 1.6.0 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.1 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -6,7 +6,7 @@
 \use_default_options false
 \language english
 \inputencoding auto
-\font_roman default
+\font_roman lmodern
 \font_sans default
 \font_typewriter default
 \font_default_family default
@@ -54,18 +54,22 @@
 \begin_body
 
 \begin_layout Standard
-Nicolas Viennot - nv2159
-\begin_inset space \hfill{}
+Daniel Benamy - Nicolas Viennot
+\begin_inset Newline newline
 \end_inset
 
-2/12/08
+
+\begin_inset Newline newline
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 
 \size larger
-COMS W4115 - ltc Reference Manual
+COMS W4115 - C Flat Reference Manual
 \end_layout
 
 \begin_layout Section
@@ -73,11 +77,14 @@ Introduction
 \end_layout
 
 \begin_layout Standard
-The ltc language is a subset of the C language.
+The C Flat language is a subset of the C language.
  Some of the core functionalities of C has been stripped: there is no preprocess
 or, no structs, no strings, not even pointers.
- ltc goal is purely educational.
- This document is inspired from the C Reference Manuel by Dennis Ritchie.
+ it's goal is purely educational.
+ Originally Nico and Dan were working on two separate languages.
+ The two projects merged, taking some features from each, and this is the
+ resulting language.
+ This document is inspired by the C Reference Manuel by Dennis Ritchie.
 \end_layout
 
 \begin_layout Section
@@ -113,6 +120,15 @@ There are two ways to place comments:
 \end_inset
 
 , they can be nested.
+ A 
+\begin_inset Formula $\texttt{//}$
+\end_inset
+
+ inside a 
+\begin_inset Formula $\texttt{/* */}$
+\end_inset
+
+ comment is ignored.
 \end_layout
 
 \begin_layout Subsection
@@ -131,11 +147,12 @@ Keywords
 \end_layout
 
 \begin_layout Standard
-The following identifiers are keywords:
+The following identifiers are reserved for use as keywords, and may not
+ be used otherwise:
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $\texttt{goto return break continue if else for while}$
+\begin_inset Formula $\texttt{return break continue if else for while try catch throw}$
 \end_inset
 
 
@@ -148,6 +165,580 @@ Constants
 \begin_layout Standard
 There is only one kind of constant: a 32 bits signed integer.
  Such a constant is a sequence of digits represented in its decimal form.
+\end_layout
+
+\begin_layout Section
+Expressions
+\end_layout
+
+\begin_layout Standard
+An expression evaluates to a 32 bits signed integer.
+ The precedence of operators is discribed in the syntax summary.
+\end_layout
+
+\begin_layout Subsection
+identifier
+\end_layout
+
+\begin_layout Standard
+An identifier evaluates to the value of the corresponding variable.
+\end_layout
+
+\begin_layout Subsection
+literal
+\end_layout
+
+\begin_layout Standard
+A decimal number is an expression.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset Formula $\texttt{(}$
+\end_inset
+
+ expression 
+\begin_inset Formula $\texttt{)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A parenthesized expression evaluates to the parenthesized expression.
+\end_layout
+
+\begin_layout Subsection
+identifier 
+\begin_inset Formula $\texttt{(}$
+\end_inset
+
+ expression-list
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+ 
+\begin_inset Formula $\texttt{)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A function call is an expression.
+ The arguments are optional and separated with a comma.
+ They are evaluated from left to right.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset Formula $\texttt{-}$
+\end_inset
+
+expression
+\end_layout
+
+\begin_layout Standard
+The result is the negative of the expression.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset Formula $\texttt{+}$
+\end_inset
+
+expression
+\end_layout
+
+\begin_layout Standard
+The result is the expression itself.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset Formula $\texttt{!}$
+\end_inset
+
+expression
+\end_layout
+
+\begin_layout Standard
+The result of the logical negation operator 
+\begin_inset Formula $\texttt{!}$
+\end_inset
+
+ is 1 if the value of the expression is 0, 0 if the value of the expression
+ is non-zero.
+\end_layout
+
+\begin_layout Subsection
+~expression
+\end_layout
+
+\begin_layout Standard
+The ~ operator yields the one's complement of its operand.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset Formula $\texttt{++}$
+\end_inset
+
+identifier
+\end_layout
+
+\begin_layout Standard
+The referred variable is incremented when evaluated.
+ The expression evaluates to the value of the variable after the incrementation.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset Formula $\texttt{-}\texttt{-}$
+\end_inset
+
+identifier
+\end_layout
+
+\begin_layout Standard
+The referred variable is decremented when evaluated.
+ The expression evaluates to the value of the variable after the decrementation.
+\end_layout
+
+\begin_layout Subsection
+identifier
+\begin_inset Formula $\texttt{++}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The referred variable is incremented when evaluated.
+ The expression evalutaes to the value of the variable before the incrementation.
+\end_layout
+
+\begin_layout Subsection
+identifier
+\begin_inset Formula $\texttt{-}\texttt{-}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The referred variable is decremented when evaluated.
+ The expression evaluates to the value of the variable before the decrementation.
+\end_layout
+
+\begin_layout Subsection
+expression 
+\begin_inset Formula $\texttt{*}$
+\end_inset
+
+ expression
+\end_layout
+
+\begin_layout Standard
+The binary 
+\begin_inset Formula $\texttt{*}$
+\end_inset
+
+ operator indicates multiplication.
+\end_layout
+
+\begin_layout Subsection
+expression 
+\begin_inset Formula $\texttt{/}$
+\end_inset
+
+ expression
+\end_layout
+
+\begin_layout Standard
+The binary 
+\begin_inset Formula $\texttt{/}$
+\end_inset
+
+operator indicates division.
+\end_layout
+
+\begin_layout Subsection
+expression 
+\begin_inset Formula $\texttt{\%}$
+\end_inset
+
+ expression
+\end_layout
+
+\begin_layout Standard
+The binary 
+\begin_inset Formula $\texttt{\%}$
+\end_inset
+
+ operator yields the remainder from the division of the first expression
+ by the second.
+ The remainder has the same sign as the dividend.
+\end_layout
+
+\begin_layout Subsection
+expression 
+\begin_inset Formula $\texttt{+}$
+\end_inset
+
+ expression
+\end_layout
+
+\begin_layout Standard
+The result is the sum of the expressions.
+\end_layout
+
+\begin_layout Subsection
+expression 
+\begin_inset Formula $\texttt{-}$
+\end_inset
+
+ expression
+\end_layout
+
+\begin_layout Standard
+The result is the difference of the expressions.
+\end_layout
+
+\begin_layout Subsection
+expression 
+\begin_inset Formula $\texttt{>\texttt{>}}$
+\end_inset
+
+ expression
+\begin_inset Newline newline
+\end_inset
+
+expression 
+\begin_inset Formula $\texttt{<}\texttt{<}$
+\end_inset
+
+ expression
+\end_layout
+
+\begin_layout Standard
+The value of the right hand side operand should be non-negative and less
+ than 32, if not the result is undefined.
+\begin_inset Newline newline
+\end_inset
+
+The value of 
+\begin_inset Quotes eld
+\end_inset
+
+E1 
+\begin_inset Formula $\texttt{>}\texttt{>}$
+\end_inset
+
+ E2
+\begin_inset Quotes erd
+\end_inset
+
+ is E1 arithmetically right-shifted by E2 bit positions.
+ Vacated bits are filled by a copy of the sign bit of the first expression.
+\begin_inset Newline newline
+\end_inset
+
+The value of 
+\begin_inset Quotes eld
+\end_inset
+
+E1 
+\begin_inset Formula $\texttt{<}\texttt{<}$
+\end_inset
+
+ E2
+\begin_inset Quotes erd
+\end_inset
+
+ is R1 left-shifted by E2 bit positions.
+ Vacated bits are 0-filled.
+\end_layout
+
+\begin_layout Subsection
+expression 
+\begin_inset Formula $\texttt{<}$
+\end_inset
+
+ expression
+\begin_inset Newline newline
+\end_inset
+
+expression 
+\begin_inset Formula $\texttt{>}$
+\end_inset
+
+ expression
+\begin_inset Newline newline
+\end_inset
+
+expression 
+\begin_inset Formula $\texttt{<}\texttt{=}$
+\end_inset
+
+ expression
+\begin_inset Newline newline
+\end_inset
+
+expression 
+\begin_inset Formula $\texttt{>}\texttt{=}$
+\end_inset
+
+ expression
+\end_layout
+
+\begin_layout Standard
+The operators 
+\begin_inset Formula $\texttt{<}$
+\end_inset
+
+ (less than), 
+\begin_inset Formula $\texttt{>}$
+\end_inset
+
+ (greater than), 
+\begin_inset Formula $\texttt{<}\texttt{=}$
+\end_inset
+
+ (less than or equal to), 
+\begin_inset Formula $\texttt{>}\texttt{=}$
+\end_inset
+
+ (greater than or equal to) all yield 0 if the specified relation is false
+ and 1 if it is true.
+\end_layout
+
+\begin_layout Subsection
+expression 
+\begin_inset Formula $\texttt{==}$
+\end_inset
+
+ expression
+\begin_inset Newline newline
+\end_inset
+
+expression 
+\begin_inset Formula $\texttt{!=}$
+\end_inset
+
+ expression
+\end_layout
+
+\begin_layout Standard
+The operators 
+\begin_inset Formula $\texttt{==}$
+\end_inset
+
+ (equal to) and the 
+\begin_inset Formula $\texttt{!=}$
+\end_inset
+
+ (not equal to) yield 0 if the specified relation is false, 1 if it is true.
+\end_layout
+
+\begin_layout Subsection
+expression 
+\begin_inset Formula $\texttt{\&}$
+\end_inset
+
+ expression
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Formula $\texttt{\&}$
+\end_inset
+
+ operator yield the bitwise 
+\begin_inset Formula $\texttt{and}$
+\end_inset
+
+ function of the operands.
+\end_layout
+
+\begin_layout Subsection
+expression 
+\begin_inset Formula $\mathcircumflex$
+\end_inset
+
+ expression
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Formula $\texttt{\&}$
+\end_inset
+
+ operator yield the bitwise exclusive 
+\begin_inset Formula $\texttt{or}$
+\end_inset
+
+ function of the operands.
+\end_layout
+
+\begin_layout Subsection
+expression 
+\begin_inset Formula $\texttt{|}$
+\end_inset
+
+ expression
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Formula $\texttt{|}$
+\end_inset
+
+ operator yield the bitwise inclusive 
+\begin_inset Formula $\texttt{or}$
+\end_inset
+
+ function of the operands.
+\end_layout
+
+\begin_layout Subsection
+expression 
+\begin_inset Formula $\texttt{\&\&}$
+\end_inset
+
+ expression
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Formula $\texttt{\&\&}$
+\end_inset
+
+ operator returns 1 if both operands are non-zero, 0 otherwise.
+ Both operands are always evaluated.
+\end_layout
+
+\begin_layout Subsection
+expression 
+\begin_inset Formula $\texttt{||}$
+\end_inset
+
+ expression
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Formula $\texttt{||}$
+\end_inset
+
+ operator returns 1 if either of its operands is non-zero, 0 otherwise.
+ Both operands are always evaluated.
+\end_layout
+
+\begin_layout Subsection
+identifier 
+\begin_inset Formula $\texttt{=}$
+\end_inset
+
+ expression
+\end_layout
+
+\begin_layout Standard
+The value of the referred variable is replaced by the value of the expression.
+\end_layout
+
+\begin_layout Subsection
+identifier 
+\begin_inset Formula $\texttt{+=}$
+\end_inset
+
+ expression
+\begin_inset Newline newline
+\end_inset
+
+identifier 
+\begin_inset Formula $\texttt{-=}$
+\end_inset
+
+ expression
+\begin_inset Newline newline
+\end_inset
+
+identifier 
+\begin_inset Formula $\texttt{*=}$
+\end_inset
+
+ expression
+\begin_inset Newline newline
+\end_inset
+
+identifier 
+\begin_inset Formula $\texttt{/=}$
+\end_inset
+
+ expression
+\begin_inset Newline newline
+\end_inset
+
+identifier 
+\begin_inset Formula $\texttt{\%=}$
+\end_inset
+
+ expression
+\begin_inset Newline newline
+\end_inset
+
+identifier 
+\begin_inset Formula $\mbox{\texttt{>}}\texttt{>=}$
+\end_inset
+
+ expression
+\begin_inset Newline newline
+\end_inset
+
+identifier 
+\begin_inset Formula $\texttt{<}\texttt{<=}$
+\end_inset
+
+ expression
+\begin_inset Newline newline
+\end_inset
+
+identifier 
+\begin_inset Formula $\texttt{\&=}$
+\end_inset
+
+ expression
+\begin_inset Newline newline
+\end_inset
+
+identifier 
+\begin_inset Formula $\mathcircumflex\texttt{=}$
+\end_inset
+
+ expression
+\begin_inset Newline newline
+\end_inset
+
+identifier 
+\begin_inset Formula $\texttt{|=}$
+\end_inset
+
+ expression
+\end_layout
+
+\begin_layout Standard
+An expression of the form 
+\begin_inset Quotes eld
+\end_inset
+
+id op= expr
+\begin_inset Quotes erd
+\end_inset
+
+ is equivalent to 
+\begin_inset Quotes eld
+\end_inset
+
+id = id op expr
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
@@ -192,7 +783,11 @@ compound-statement:
 \begin_inset Formula $\texttt{\{}$
 \end_inset
 
- statement-list 
+ statement-list
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+ 
 \begin_inset Formula $\texttt{\}}$
 \end_inset
 
@@ -485,6 +1080,32 @@ causes control to pass to the loop-continuation portion of the smallest
 \end_inset
 
  statement; that is to the end of the loop.
+ In case of a 
+\begin_inset Formula $\texttt{for}$
+\end_inset
+
+ loop of the form 
+\begin_inset Quotes eld
+\end_inset
+
+
+\begin_inset Formula $\texttt{for(e1;e2;e3) \{...\}}$
+\end_inset
+
+
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Formula $\texttt{e3}$
+\end_inset
+
+ is evaluated before evaluating 
+\begin_inset Formula $\texttt{e2}$
+\end_inset
+
+.
+ TODO Rephrase.
 \end_layout
 
 \begin_layout Subsection
@@ -515,49 +1136,6 @@ The value of the expression is returned to the caller of the function.
 \end_layout
 
 \begin_layout Subsection
-Goto statement
-\end_layout
-
-\begin_layout Standard
-Control may be transferred unconditionally by means of the statement
-\end_layout
-
-\begin_layout Itemize
-\begin_inset Formula $\texttt{goto}$
-\end_inset
-
- identifier 
-\begin_inset Formula $\texttt{;}$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The identifier should be a label.
-\end_layout
-
-\begin_layout Subsection
-Labelled statement
-\end_layout
-
-\begin_layout Standard
-Any statement may be preceded by label prefixes of the form
-\end_layout
-
-\begin_layout Itemize
-identifier 
-\begin_inset Formula $:$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-which serve to declare the identifier as a label.
-\end_layout
-
-\begin_layout Subsection
 Null statement
 \end_layout
 
@@ -573,15 +1151,7 @@ The null statement has the form
 \end_layout
 
 \begin_layout Standard
-A null statement is useful to carry a label just before the 
-\begin_inset Quotes eld
-\end_inset
-
-}
-\begin_inset Quotes erd
-\end_inset
-
- of a compound statement or to supply a null body to a looping statement
+A null statement is useful to supply a null body to a looping statement
  such as 
 \begin_inset Formula $\texttt{while}$
 \end_inset
@@ -589,29 +1159,141 @@ A null statement is useful to carry a label just before the
 .
 \end_layout
 
-\begin_layout Section
-Exceptions
+\begin_layout Subsection
+Try-catch statement
 \end_layout
 
 \begin_layout Standard
-How Exceptions Work ------------------- When entering a try block, we push
- an exception handling block onto the stack.
- It contains in this order: 1) Frame (base) pointer 2) A pointer to the
- previous EH block 3) Address of corresponding catch block We also store
- the location of the most recent EH block in a global pointer.
+The two form of the try-catch statement are
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{try \{}$
+\end_inset
+
+ statement-list
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\noun off
+\color none
+
+\begin_inset Formula $\texttt{ \} catch ( }$
+\end_inset
+
+identifier
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\noun default
+\color inherit
+
+\begin_inset Formula $\texttt{ ) \{}$
+\end_inset
+
+ statement-list
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+
+\begin_inset Formula $\texttt{ \}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{try \{}$
+\end_inset
+
+ statement-list
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\noun off
+\color none
+
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+
+\begin_inset Formula $\texttt{ \} catch }$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\noun default
+\color inherit
+
+\begin_inset Formula $\texttt{\{}$
+\end_inset
+
+ statement-list
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+
+\begin_inset Formula $\texttt{ \}}$
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-When an exception is thrown, we store the throw value in eax.
- Then we use the global pointer to restore the frame pointer and stack pointer
- of the catching function, restore the old value of the global pointer,
- and jmp to the catch block.
+The statments enclosed in the try block are executed until an exception
+ is thrown.
+ In case no exception is thrown, the statments enclosed in the catch block
+ are not executed.
+ The first form of the try-catch statement allows to assign the value of
+ the exception to a variable.
 \end_layout
 
 \begin_layout Standard
-When the program leaves a try or catch block, it pops the EH block off the
- stack.
- 
+TODO say they dynamically stack.
+\end_layout
+
+\begin_layout Subsection
+Throw statement
+\end_layout
+
+\begin_layout Standard
+The throw statement has the form
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{throw}$
+\end_inset
+
+ expression 
+\begin_inset Formula $\texttt{;}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Throwing an exception causes control to pass to the catch block of the nearest
+ dynamically-enclosing try-catch statement.
+ If none is found, it causes the program to terminate with an error.
+ The given expression is the value of the thrown exception.
 \end_layout
 
 \begin_layout Section
@@ -655,14 +1337,32 @@ identifier
 \end_inset
 
  
-\begin_inset Formula $\texttt{)}$
+\begin_inset Formula $\texttt{) \{}$
 \end_inset
 
+ statement-list
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\noun off
+\color none
+
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\noun default
+\color inherit
  
-\begin_inset Formula $\{$
-\end_inset
-
- statement-list 
 \begin_inset Formula $\texttt{\}}$
 \end_inset
 
@@ -721,14 +1421,14 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Formula $\quad\texttt{m = a > b ? a : b;}$
+\begin_inset Formula $\quad\texttt{if (a > b) m = a; else m = b;}$
 \end_inset
 
 
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Formula $\quad\texttt{return m > c ? m : c;}$
+\begin_inset Formula $\quad\texttt{if (m > c) return m; else return c;}$
 \end_inset
 
 
@@ -755,7 +1455,19 @@ Scope rules
 \end_layout
 
 \begin_layout Standard
-A complete runnable ltc program doesn't need to go 
+TODO
+\end_layout
+
+\begin_layout Standard
+variables: scope is the function
+\end_layout
+
+\begin_layout Standard
+different namespace for variables and function
+\end_layout
+
+\begin_layout Standard
+can call whatever function with any number of arguments
 \end_layout
 
 \begin_layout Section
@@ -776,7 +1488,7 @@ identifier
 \end_layout
 
 \begin_layout Itemize
-constant
+literal
 \end_layout
 
 \begin_layout Itemize
@@ -814,6 +1526,13 @@ expression
 \end_layout
 
 \begin_layout Itemize
+\begin_inset Formula $\texttt{+}$
+\end_inset
+
+expression
+\end_layout
+
+\begin_layout Itemize
 \begin_inset Formula $\texttt{!}$
 \end_inset
 
@@ -835,7 +1554,7 @@ identifier
 \end_layout
 
 \begin_layout Itemize
-\begin_inset Formula $\texttt{--}$
+\begin_inset Formula $\texttt{-}\texttt{-}$
 \end_inset
 
 identifier
@@ -851,7 +1570,7 @@ identifier
 
 \begin_layout Itemize
 identifier
-\begin_inset Formula $\texttt{--}$
+\begin_inset Formula $\texttt{-}\texttt{-}$
 \end_inset
 
 
@@ -859,18 +1578,6 @@ identifier
 
 \begin_layout Itemize
 expression binop expression
-\end_layout
-
-\begin_layout Itemize
-expression 
-\begin_inset Formula $\texttt{?}$
-\end_inset
-
- expression 
-\begin_inset Formula $\texttt{:}$
-\end_inset
-
- expression
 \end_layout
 
 \begin_layout Itemize
@@ -905,24 +1612,16 @@ expression
 
 \end_deeper
 \begin_layout Standard
-The operator 
-\begin_inset Formula $\texttt{()}$
-\end_inset
-
- has highest priority.
-\begin_inset Newline newline
-\end_inset
-
 The unary operators 
-\begin_inset Formula $\texttt{- ! }\sim\texttt{ ++ --}$
+\begin_inset Formula $\texttt{- + !}\sim$
 \end_inset
 
- have higher priority than binary operator, and group right to left.
+ have higher priority than binary operator.
 \begin_inset Newline newline
 \end_inset
 
-Binary operators and the conditional operator all group left to right and
- have priority decreasing as indicated:
+Binary operators all group left to right and have priority decreasing as
+ indicated:
 \end_layout
 
 \begin_layout Itemize
@@ -945,7 +1644,7 @@ binop:
 \end_layout
 
 \begin_layout Itemize
-\begin_inset Formula $\texttt{>> <<}$
+\begin_inset Formula $\texttt{>}\mbox{\texttt{>} }\texttt{<}\texttt{<}$
 \end_inset
 
 
@@ -960,6 +1659,13 @@ binop:
 
 \begin_layout Itemize
 \begin_inset Formula $\texttt{== !=}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{\&}$
 \end_inset
 
 
@@ -991,13 +1697,6 @@ binop:
 \end_inset
 
 
-\end_layout
-
-\begin_layout Itemize
-\begin_inset Formula $\texttt{? :}$
-\end_inset
-
-
 \begin_inset Newline newline
 \end_inset
 
@@ -1010,22 +1709,18 @@ Assignment operator all have the same priority, and all group right to left.
 \end_layout
 
 \begin_layout Itemize
-asnop:
+asgnop:
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-\begin_inset Formula $\texttt{= =+ =- =* =/ =\%=>> =<< =\&=}\wedge\texttt{ =}$
+\begin_inset Formula $\texttt{= += -= *= /= \%= >}\texttt{>= <}\texttt{<= \&= }\wedge\texttt{= |=}$
 \end_inset
 
 
 \end_layout
 
 \end_deeper
-\begin_layout Standard
-The comma operator has the lowest priority, and groups left to right.
-\end_layout
-
 \begin_layout Subsection
 Statements
 \end_layout
@@ -1047,7 +1742,11 @@ expression
 \begin_inset Formula $\texttt{\{}$
 \end_inset
 
- statement-list 
+ statement-list
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+ 
 \begin_inset Formula $\texttt{\}}$
 \end_inset
 
@@ -1140,7 +1839,7 @@ expression
 \begin_inset Formula $\texttt{return}$
 \end_inset
 
- expression 
+ expression
 \begin_inset Formula $\texttt{;}$
 \end_inset
 
@@ -1148,22 +1847,104 @@ expression
 \end_layout
 
 \begin_layout Itemize
-\begin_inset Formula $\texttt{goto}$
+\begin_inset Formula $\texttt{try \{}$
 \end_inset
 
- identifier 
-\begin_inset Formula $\texttt{;}$
+ statement-list
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\noun off
+\color none
+
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+
+\begin_inset Formula $\texttt{ \} catch }$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\noun default
+\color inherit
+
+\begin_inset Formula $\texttt{\{}$
+\end_inset
+
+ statement-list
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+
+\begin_inset Formula $\texttt{ \}}$
 \end_inset
 
 
 \end_layout
 
 \begin_layout Itemize
-identifier 
-\begin_inset Formula $:$
+\begin_inset Formula $\texttt{try \{}$
 \end_inset
 
- statement
+ statement-list
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\noun off
+\color none
+
+\begin_inset Formula $\texttt{ \} catch ( }$
+\end_inset
+
+identifier
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\noun default
+\color inherit
+
+\begin_inset Formula $\texttt{ ) \{}$
+\end_inset
+
+ statement-list
+\begin_inset Formula $_{\mathrm{opt}}$
+\end_inset
+
+
+\begin_inset Formula $\texttt{ \}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\texttt{throw}$
+\end_inset
+
+ expression
+\begin_inset Formula $\texttt{;}$
+\end_inset
+
+
 \end_layout
 
 \begin_layout Itemize
@@ -1233,14 +2014,14 @@ identifier
 \end_inset
 
  
-\begin_inset Formula $\texttt{)}$
+\begin_inset Formula $\texttt{) \{}$
+\end_inset
+
+ statement-list
+\begin_inset Formula $_{\mathrm{opt}}$
 \end_inset
 
  
-\begin_inset Formula $\{$
-\end_inset
-
- statement-list 
 \begin_inset Formula $\texttt{\}}$
 \end_inset
 
