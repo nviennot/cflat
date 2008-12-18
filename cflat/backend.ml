@@ -41,14 +41,12 @@ an exception looks like this:
       struct exception *next;
       void *catch_address;
       int  old_ebp;
-      int  old_esp;
     };
 *)
 
-let exception_context_size = 16
+let exception_context_size = 3*4
 
 let stack_exception catch_label =
-          "push esp\n" ^
           "push ebp\n" ^
   sprintf "push offset %s\n" catch_label ^
           "push dword ptr [__exception_ptr]\n" ^
@@ -259,7 +257,7 @@ let rec string_of_stmt context fdecl = function
               "call __uncaught_exception\n" ^
       sprintf "%s:\n" caught_exception ^
       unwind_exception 1 ^
-              "mov  esp, [ecx+12]\n" ^ (* exception is unstacked *)
+              "lea  esp, [ecx+12]\n" ^ (* exception is unstacked *)
               "mov  ebp, [ecx+8]\n" ^
               "jmp  [ecx+4]\n"
 
