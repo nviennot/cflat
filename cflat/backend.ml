@@ -136,17 +136,21 @@ let rec eval_expr_to_eax fdecl = function
         | _ -> "")
 
   | Assignop(v, o, e) ->
+      let assign_binop binop =
+        eval_expr_to_eax fdecl (Assignop(v, Assign, Binop(Id(v), binop, e))) in
       (match o with
-        Assign -> eval_expr_to_eax fdecl e ^
-                  sprintf "mov [ebp+%d], eax\n" (id_to_offset fdecl v)
-      | _ ->
-          let binop = (match o with
-            Add_assign -> Add | Sub_assign -> Sub | Mult_assign -> Mult
-          | Div_assign -> Div | Modulo_assign -> Modulo | Bw_or_assign -> Bw_or
-          | Bw_and_assign -> Bw_and | Bw_xor_assign -> Bw_xor
-          | Lshift_assign -> Lshift | Rshift_assign -> Rshift
-          | Assign -> raise (Failure("should not happen (matched before)"))) in
-          eval_expr_to_eax fdecl (Assignop(v, Assign, Binop(Id(v), binop, e))))
+        Assign        -> eval_expr_to_eax fdecl e ^
+                         sprintf "mov [ebp+%d], eax\n" (id_to_offset fdecl v)
+      | Add_assign    -> assign_binop Add
+      | Sub_assign    -> assign_binop Sub
+      | Mult_assign   -> assign_binop Mult
+      | Div_assign    -> assign_binop Div
+      | Modulo_assign -> assign_binop Modulo
+      | Bw_or_assign  -> assign_binop Bw_or
+      | Bw_and_assign -> assign_binop Bw_and
+      | Bw_xor_assign -> assign_binop Bw_xor
+      | Lshift_assign -> assign_binop Lshift
+      | Rshift_assign -> assign_binop Rshift)
 
   | Call(f, el) ->
       let push_func_args =
