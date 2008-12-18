@@ -261,8 +261,6 @@ let rec string_of_stmt context fdecl = function
               "mov  ebp, [ecx+8]\n" ^
               "jmp  [ecx+4]\n"
 
-let string_of_vdecl id = "int " ^ id ^ ";\n"
-
 let string_of_fdecl context fdecl =
   let context' = { context with return_label = Some (get_new_label context) } in
   sprintf ".globl %s\n" fdecl.fname ^
