@@ -66,13 +66,13 @@ let check_func fdecl =
   (* first check that each formal is only declared once *)
   let rec check_formal_unique formal_list formal =
     (match formal_list with
-          [] -> [formal]
-        | hd :: tl ->
-            if hd = formal then
-               raise (Failure("formal " ^ formal ^ " is declared more than once" ^
-                              " in function " ^ fdecl._fname))
-            else
-               hd :: check_formal_unique tl formal) in
+        [] -> [formal]
+      | hd :: tl ->
+          if hd = formal then
+             raise (Failure("formal " ^ formal ^ " is declared more than once" ^
+                            " in function " ^ fdecl._fname))
+          else
+             hd :: check_formal_unique tl formal) in
   let _ = List.fold_left check_formal_unique [] fdecl._formals in
 
   let context = { in_loop = false; variables = ref [] } in
