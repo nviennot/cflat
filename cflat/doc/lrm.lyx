@@ -226,7 +226,13 @@ identifier
 \begin_layout Standard
 A function call is an expression.
  The arguments are optional and separated with a comma.
- They are evaluated from left to right.
+ They are evaluated from left to right before the call (applicative order).
+ The value returned by the function is the value the callee returns with
+ a 
+\begin_inset Formula $\texttt{return}$
+\end_inset
+
+ statement.
 \end_layout
 
 \begin_layout Subsection
@@ -276,6 +282,56 @@ The ~ operator yields the one's complement of its operand.
 \end_layout
 
 \begin_layout Subsection
+identifier
+\begin_inset Formula $\texttt{++}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The referred variable is incremented when evaluated.
+ The expression evalutaes to the value of the variable before the incrementation.
+\begin_inset Newline newline
+\end_inset
+
+Note that the statement 
+\begin_inset Quotes eld
+\end_inset
+
+
+\begin_inset Formula $\texttt{\{ a=0; b=0; b = a++ + a++ \}}$
+\end_inset
+
+
+\begin_inset Quotes erd
+\end_inset
+
+ sets the value of 
+\begin_inset Formula $\texttt{a}$
+\end_inset
+
+ to 2, and 
+\begin_inset Formula $\texttt{b}$
+\end_inset
+
+ to 1.
+\end_layout
+
+\begin_layout Subsection
+identifier
+\begin_inset Formula $\texttt{-}\texttt{-}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The referred variable is decremented when evaluated.
+ The expression evaluates to the value of the variable before the decrementation.
+\end_layout
+
+\begin_layout Subsection
 \begin_inset Formula $\texttt{++}$
 \end_inset
 
@@ -297,32 +353,6 @@ identifier
 \begin_layout Standard
 The referred variable is decremented when evaluated.
  The expression evaluates to the value of the variable after the decrementation.
-\end_layout
-
-\begin_layout Subsection
-identifier
-\begin_inset Formula $\texttt{++}$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The referred variable is incremented when evaluated.
- The expression evalutaes to the value of the variable before the incrementation.
-\end_layout
-
-\begin_layout Subsection
-identifier
-\begin_inset Formula $\texttt{-}\texttt{-}$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The referred variable is decremented when evaluated.
- The expression evaluates to the value of the variable before the decrementation.
 \end_layout
 
 \begin_layout Subsection
@@ -1264,10 +1294,7 @@ The statments enclosed in the try block are executed until an exception
  are not executed.
  The first form of the try-catch statement allows to assign the value of
  the exception to a variable.
-\end_layout
-
-\begin_layout Standard
-TODO say they dynamically stack.
+ Try-catch statement dynamically nest across function calls.
 \end_layout
 
 \begin_layout Subsection
@@ -1397,6 +1424,24 @@ identifier
 
 \end_deeper
 \begin_layout Standard
+the same identifier cannot be used more than once in the parameter list.
+ Within the same program, A function cannot be defined twice (name wise).
+\begin_inset Newline newline
+\end_inset
+
+All functions return a integer value.
+ A function can return to the caller without an explicit 
+\begin_inset Formula $\texttt{return}$
+\end_inset
+
+ statement, in this case the return value is undefined.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
 A simple exemple of a complete function definition:
 \end_layout
 
@@ -1455,23 +1500,50 @@ Scope rules
 \end_layout
 
 \begin_layout Standard
-TODO
+There is no global variable, but only local variables which are statically
+ binded.
+ The scope of a local variable is the whole function where the variable
+ is used.
+ The scope of function parameters is the whole function.
 \end_layout
 
 \begin_layout Standard
-variables: scope is the function
+Function scope is the entire program.
+\end_layout
+
+\begin_layout Section
+Declarations
 \end_layout
 
 \begin_layout Standard
-different namespace for variables and function
+Variables don't need to be declared, they are initialized to 0.
+\begin_inset Newline newline
+\end_inset
+
+A function call can be made whether or not the function actually exists,
+ the program will simply not link if a call to a non-existing function is
+ made.
+\end_layout
+
+\begin_layout Section
+Namespace
 \end_layout
 
 \begin_layout Standard
-can call whatever function with any number of arguments
-\end_layout
+Variables and function use different namespaces.
+ Therefore such a function is correct: 
+\begin_inset Quotes eld
+\end_inset
 
-\begin_layout Standard
-function returning without a return ...;
+
+\begin_inset Formula $\texttt{f() \{ f=1; return f; \}}$
+\end_inset
+
+
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
