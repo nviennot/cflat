@@ -77,7 +77,7 @@ Introduction
 \end_layout
 
 \begin_layout Standard
-The C Flat language is a subset of the C language.
+The C Flat language is mostly a subset of the C language.
  Some of the core functionalities of C has been stripped: there is no preprocess
 or, no structs, no strings, not even pointers.
  it's goal is purely educational.
@@ -173,7 +173,7 @@ Expressions
 
 \begin_layout Standard
 An expression evaluates to a 32 bits signed integer.
- The precedence of operators is discribed in the syntax summary.
+ The precedence of operators is described in the syntax summary.
 \end_layout
 
 \begin_layout Subsection
@@ -291,7 +291,7 @@ identifier
 
 \begin_layout Standard
 The referred variable is incremented when evaluated.
- The expression evalutaes to the value of the variable before the incrementation.
+ The expression evalutaes to the value of the variable before the increment.
 \begin_inset Newline newline
 \end_inset
 
@@ -300,7 +300,7 @@ Note that the statement
 \end_inset
 
 
-\begin_inset Formula $\texttt{\{ a=0; b=0; b = a++ + a++ \}}$
+\begin_inset Formula $\texttt{\{a = 0; b = 0; b = a++ + a++; \}}$
 \end_inset
 
 
@@ -328,7 +328,7 @@ identifier
 
 \begin_layout Standard
 The referred variable is decremented when evaluated.
- The expression evaluates to the value of the variable before the decrementation.
+ The expression evaluates to the value of the variable before the decrement.
 \end_layout
 
 \begin_layout Subsection
@@ -340,7 +340,7 @@ identifier
 
 \begin_layout Standard
 The referred variable is incremented when evaluated.
- The expression evaluates to the value of the variable after the incrementation.
+ The expression evaluates to the value of the variable after the increment.
 \end_layout
 
 \begin_layout Subsection
@@ -352,7 +352,7 @@ identifier
 
 \begin_layout Standard
 The referred variable is decremented when evaluated.
- The expression evaluates to the value of the variable after the decrementation.
+ The expression evaluates to the value of the variable after the decrement.
 \end_layout
 
 \begin_layout Subsection
@@ -1081,7 +1081,7 @@ casuses termination of the smallest enclosing
 \begin_inset Formula $\texttt{for}$
 \end_inset
 
- statement; control passes the the statement following the terminated statement.
+ statement; control passes to the statement following the terminated statement.
 \end_layout
 
 \begin_layout Subsection
@@ -1130,12 +1130,11 @@ causes control to pass to the loop-continuation portion of the smallest
 \begin_inset Formula $\texttt{e3}$
 \end_inset
 
- is evaluated before evaluating 
+ is evaluated before checking 
 \begin_inset Formula $\texttt{e2}$
 \end_inset
 
 .
- TODO Rephrase.
 \end_layout
 
 \begin_layout Subsection
@@ -1215,7 +1214,7 @@ The two form of the try-catch statement are
 \noun off
 \color none
 
-\begin_inset Formula $\texttt{ \} catch ( }$
+\begin_inset Formula $\texttt{ \}catch ( }$
 \end_inset
 
 identifier
@@ -1260,7 +1259,7 @@ identifier
 \end_inset
 
 
-\begin_inset Formula $\texttt{ \} catch }$
+\begin_inset Formula $\texttt{ \}catch }$
 \end_inset
 
 
@@ -1442,7 +1441,7 @@ All functions return a integer value.
 \begin_inset Newline newline
 \end_inset
 
-A simple exemple of a complete function definition:
+A simple example of a complete function definition:
 \end_layout
 
 \begin_layout Standard
@@ -1500,7 +1499,7 @@ Scope rules
 \end_layout
 
 \begin_layout Standard
-There is no global variable, but only local variables which are statically
+There are no global variables, but only local variables which are statically
  binded.
  The scope of a local variable is the whole function where the variable
  is used.
@@ -1536,7 +1535,7 @@ Variables and function use different namespaces.
 \end_inset
 
 
-\begin_inset Formula $\texttt{f() \{ f=1; return f; \}}$
+\begin_inset Formula $\texttt{f() \{f=1; return f; \}}$
 \end_inset
 
 
@@ -1940,7 +1939,7 @@ expression
 \end_inset
 
 
-\begin_inset Formula $\texttt{ \} catch }$
+\begin_inset Formula $\texttt{ \}catch }$
 \end_inset
 
 
@@ -1985,7 +1984,7 @@ expression
 \noun off
 \color none
 
-\begin_inset Formula $\texttt{ \} catch ( }$
+\begin_inset Formula $\texttt{ \}catch ( }$
 \end_inset
 
 identifier
